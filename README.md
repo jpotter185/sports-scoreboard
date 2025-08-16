@@ -1,97 +1,73 @@
-# ⚽🏈⚾ Sports Scoreboard (SvelteKit)
+# Sports Scoreboard
 
-Live scoreboard for NFL, MLS, EPL, and MLB using ESPN’s public scoreboard endpoints. Responsive, auto-refreshing, and fast to deploy.
+A clean, fast scoreboard you can open on any device to see what matters now: live professional sports scores and game status for the NFL, MLS, MLB, and EPL.
 
-## ✨ Features
+### What it does
+- Shows today’s games by league, with clear, compact tiles that are easy to read on phone or desktop
+- Highlights what’s live right now and refreshes automatically every 30 seconds
+- Lets you collapse leagues, jump directly to a league, and reorder leagues to match your preferences
+- Uses team branding (logos and colors) for quick visual recognition
+- Links each game tile to its official ESPN game page for deeper details
 
-- **Leagues**: NFL (🏈), MLS/EPL (⚽), MLB (⚾)
-- **Real-time-ish**: Auto-refresh every 30s with in-place updates (no layout jump)
-- **Clickable games**: Each card links to the ESPN game page
-- **Status-aware UI**: Scheduled, Live, Final styling; soccer halves vs. football quarters; MLB Top/Bottom inning
-- **Logos & colors**: Pulled dynamically from ESPN; neutral fallback if missing
-- **Cleaner cards**: Away @ Home format, scores hidden when scheduled, unified date/time at bottom
-- **Winner/loser states**: Winner highlighted; loser/tie grayed
-- **League UX**: Collapsible sections with persistence; drag-and-drop reorder with a grab handle (order persists)
+### Who it’s for
+- Fans who want a single place to check live scores across multiple leagues
+- People who follow multiple sports and want quick navigation and personalization
+- Anyone who wants a fast, mobile-friendly scoreboard they can share or deploy quickly
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+
-
-### Install & Run
-```bash
-git clone <your-repo-url>
-cd sports-scoreboard
-npm install
-npm run dev
-# open http://localhost:5173
-```
-
-## 🔌 Data Sources
-
-Uses ESPN’s public scoreboard endpoints (no API key):
-- NFL: `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`
-- MLS: `https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard`
-- EPL: `https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard`
-- MLB: `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard`
-
-Parsing happens in `src/lib/api.ts`, then it’s aggregated in `src/lib/data.ts`.
-
-## 🏗️ Project Structure
-
-```
-src/
-├── lib/
-│   ├── components/
-│   │   ├── GameCard.svelte         # Game tile
-│   │   └── LeagueSection.svelte    # Collapsible league section
-│   ├── api.ts                      # ESPN fetch + conversion
-│   ├── data.ts                     # Aggregate leagues & build page model
-│   ├── types.ts                    # Shared types
-│   └── index.ts
-├── routes/
-│   ├── +layout.svelte
-│   └── +page.svelte                # Main page, refresh-in-place, drag reorder
-└── app.css                         # Global styles
-```
-
-## 🧭 Usage Tips
-
-- Collapse a league via its header; state persists per league.
-- Drag with the handle (dotted grip) to reorder leagues; persisted in localStorage.
-- Click a game card to view it on ESPN.
-
-## ☁️ Deploy (Vercel)
-
-1) Push this repo to GitHub
-2) In Vercel → New Project → Import GitHub repo
-3) Framework: SvelteKit (auto), Build: default (npm run build)
-4) Deploy
-
-No env vars required. ESPN calls are HTTPS and public.
-
-CLI alternative (no GitHub):
-```bash
-npm i -g vercel
-vercel
-vercel --prod
-```
-
-## 🛡️ Security & Notes
-
-- No secrets are used; no user data is collected
-- Calls are client-side; if CORS ever blocks, add a small read-only proxy
-- ESPN rate limits may apply; optional backoff can be added later
-
-## 🛠️ Tech Stack
-
-- SvelteKit 5, TypeScript, Vite
-- CSS in components (no dependency on Tailwind for cards)
-
-## 📄 License
-
-MIT
+### Why teams love it
+- Clear status at a glance: Scheduled, Live, Final
+- League-level rollups where it matters (e.g., live counts, final counts); no clutter at the top
+- Consistent, readable formatting for dates and live periods (quarters, halves, innings with outs)
+- Mobile-first refinements: smaller tiles, single-column grid, tap targets for reordering
 
 ---
 
-Built with ❤️ using SvelteKit
+## Key Capabilities
+
+- Live scores and status
+  - NFL (🏈), MLS/EPL (⚽), MLB (⚾)
+  - Auto-refresh every 30 seconds
+  - Live context per sport: quarters (NFL), halves (soccer), “Top/Bottom” inning with outs (MLB)
+
+- Personalized viewing
+  - Collapse/expand leagues; preferences persisted automatically
+  - Drag-and-drop to reorder leagues on desktop; one-tap Up/Down controls for mobile
+  - “Jump to league” chips that expand the target league, collapse the rest, and scroll to the top
+  - “Live only” filter to hide leagues without live games and show only in-progress games
+
+- Clear, compact game tiles
+  - Team logos and colors for fast visual scanning
+  - Winner/loser styling once games go final; ties shown in a neutral style
+  - Scores hidden for scheduled games; date/time shown in one consistent line
+  - Entire tile is a link to the ESPN game page (opens in a new tab)
+
+---
+
+## Reliability & Data
+
+- Data source: public ESPN scoreboard endpoints
+- No accounts, no API keys, and no personal data collection
+- HTTPS by default; designed to be safe to share publicly
+
+---
+
+## Access & Deployment
+
+- One‑click deploy to Vercel (recommended)
+  - Connect your repository and deploy; no configuration or secrets required
+  - The app auto-refreshes on a schedule client-side
+
+- Shareable by link
+  - Send the deployed URL to friends, teammates, or put it on a tablet on your coffee table
+
+---
+
+## Roadmap (optional future)
+- Favorite teams view
+- Alerts for close games or final results
+- Theme options (dark mode, compact mode)
+- Day/week navigation and historical results
+
+---
+
+Questions or ideas? Open an issue or share feedback so we can make the live experience even better.

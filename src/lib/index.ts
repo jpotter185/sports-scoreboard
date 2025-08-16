@@ -1,5 +1,5 @@
 // Export types
-export type { Team, Game, League, ScoreboardData, APIGame, APITeam } from './types';
+export type { Team, Game, League, ScoreboardData } from './types';
 
 // Export data functions
 export { getScoreboardData, scoreboardData } from './data';
@@ -10,7 +10,6 @@ export {
   fetchMLSTeams, 
   fetchNFLGames, 
   fetchMLSGames,
-  getNFLInfo,
   fetchMLBTeams,
   fetchMLBGames
 } from './api';

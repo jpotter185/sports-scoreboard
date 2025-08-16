@@ -251,35 +251,7 @@
     border: 1px solid #f3f4f6;
   }
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 24px;
-    align-items: center;
-  }
-
-  .stat-item {
-    text-align: center;
-    padding: 16px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    border: 1px solid #e2e8f0;
-  }
-
-  .stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1e293b;
-    margin-bottom: 4px;
-  }
-
-  .stat-label {
-    font-size: 0.875rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-  }
+  /* removed old stats grid styles */
 
   .last-updated {
     text-align: center;
@@ -384,9 +356,7 @@
     .subtitle { font-size: 0.8rem; margin-bottom: 10px; }
     .refresh-button { padding: 6px 12px; font-size: 0.8rem; }
     .stats-bar { border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .stat-number { font-size: 1.25rem; }
-    .stat-label { font-size: 0.75rem; }
+    /* removed old stats grid styles */
   }
 
   /* League jump nav */
@@ -471,26 +441,8 @@
       </button>
     </div>
   {:else}
-    <!-- Stats Bar -->
+    <!-- League Jump Nav & Controls -->
     <div class="stats-bar">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-number">{scoreboardData.leagues.length}</div>
-          <div class="stat-label">Leagues</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">{totalGames}</div>
-          <div class="stat-label">Total Games</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">{liveGames}</div>
-          <div class="stat-label">Live Games</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">{finalGames}</div>
-          <div class="stat-label">Final Games</div>
-        </div>
-      </div>
       <div class="leagues-nav">
         {#each orderedLeagues as l (l.id)}
           <a class="nav-chip" href={`#league-${l.id}`} on:click|preventDefault={() => onJumpLeague(l.id)}>

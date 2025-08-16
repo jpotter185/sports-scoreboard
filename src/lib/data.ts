@@ -1,5 +1,5 @@
 import type { ScoreboardData, League, Team, Game } from './types';
-import { fetchNFLGames, fetchMLSGames, getNFLInfo, fetchEPLGames, fetchMLBGames } from './api';
+import { fetchNFLGames, fetchMLSGames, fetchEPLGames, fetchMLBGames } from './api';
 
 function deriveTeamsFromGames(games: Game[]): Team[] {
   const teams = new Map<string, Team>();
@@ -12,12 +12,11 @@ function deriveTeamsFromGames(games: Game[]): Team[] {
 
 export async function getScoreboardData(): Promise<ScoreboardData> {
   try {
-    const [nflGames, mlsGames, eplGames, mlbGames, nflInfo] = await Promise.all([
+    const [nflGames, mlsGames, eplGames, mlbGames] = await Promise.all([
       fetchNFLGames(),
       fetchMLSGames(),
       fetchEPLGames(),
-      fetchMLBGames(),
-      getNFLInfo()
+      fetchMLBGames()
     ]);
 
     const nflTeams = deriveTeamsFromGames(nflGames);
@@ -30,9 +29,7 @@ export async function getScoreboardData(): Promise<ScoreboardData> {
       name: 'National Football League',
       sport: 'Football',
       teams: nflTeams,
-      games: nflGames,
-      season: nflInfo.season.toString(),
-      currentWeek: nflInfo.week
+      games: nflGames
     };
 
     const mls: League = {
@@ -40,8 +37,7 @@ export async function getScoreboardData(): Promise<ScoreboardData> {
       name: 'Major League Soccer',
       sport: 'Soccer',
       teams: mlsTeams,
-      games: mlsGames,
-      season: '2024' // MLS season info not yet fetched from API
+      games: mlsGames
     };
 
     const epl: League = {
@@ -49,8 +45,7 @@ export async function getScoreboardData(): Promise<ScoreboardData> {
       name: 'English Premier League',
       sport: 'Soccer',
       teams: eplTeams,
-      games: eplGames,
-      season: '2024/25' // EPL season format
+      games: eplGames
     };
 
     const mlb: League = {
@@ -58,8 +53,7 @@ export async function getScoreboardData(): Promise<ScoreboardData> {
       name: 'Major League Baseball',
       sport: 'Baseball',
       teams: mlbTeams,
-      games: mlbGames,
-      season: new Date().getFullYear().toString()
+      games: mlbGames
     };
 
     return {

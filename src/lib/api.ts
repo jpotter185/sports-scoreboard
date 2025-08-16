@@ -296,36 +296,5 @@ export async function fetchMLBTeams(): Promise<Team[]> {
   }
 }
 
-export async function getNFLInfo(): Promise<{ week: number; season: number; seasonType: string }> {
-  async function fetchInfo(query: string = ''): Promise<ESPNScheduleResponse> {
-    const url = query ? `${ESPN_NFL_API}?${query}` : ESPN_NFL_API;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch NFL info from ESPN API');
-    return response.json();
-  }
-
-  try {
-    // First try default endpoint
-    let data: ESPNScheduleResponse = await fetchInfo();
-    let league = data.leagues?.[0];
-
-    // If ESPN reports Offseason (type 4), retry asking explicitly for Preseason
-    if (!league || league.season.type === 4) {
-      data = await fetchInfo('seasontype=1');
-      league = data.leagues?.[0] || league;
-    }
-
-    const type = league?.season.type ?? 2;
-    const seasonType = type === 1 ? 'Preseason' : type === 2 ? 'Regular Season' : type === 3 ? 'Postseason' : 'Off Season';
-
-    return {
-      week: league?.week?.number ?? 0,
-      season: league?.season.year || new Date().getFullYear(),
-      seasonType
-    };
-  } catch (error) {
-    console.error('Error fetching NFL info:', error);
-    return { week: 0, season: new Date().getFullYear(), seasonType: 'Regular Season' };
-  }
-}
+// Removed unused getNFLInfo
  

@@ -42,25 +42,4 @@ export interface ScoreboardData {
   lastUpdated: string;
 }
 
-export interface APIGame {
-  id: string;
-  home_team: string;
-  away_team: string;
-  home_score: number;
-  away_score: number;
-  status: string;
-  time?: string;
-  quarter?: string;
-  period?: string;
-  date: string;
-  venue?: string;
-}
-
-export interface APITeam {
-  id: string;
-  name: string;
-  city: string;
-  abbreviation: string;
-  conference?: string;
-  division?: string;
-}
+// Removed APIGame and APITeam (not used)
