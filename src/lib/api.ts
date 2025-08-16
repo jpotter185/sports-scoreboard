@@ -34,6 +34,9 @@ interface ESPNGame {
       };
       records?: Array<{ summary: string }>;
     }>;
+    situation?: {
+      outs?: number;
+    };
     venue?: {
       fullName: string;
     };
@@ -82,40 +85,7 @@ function convertESPNStatus(espnStatus: ESPNGame['status']): 'scheduled' | 'live'
   return 'scheduled';
 }
 
-// Update ESPNGame status interface to include displayClock instead of nested clock.displayValue
-interface ESPNGame {
-  id: string;
-  date: string;
-  status: {
-    type: {
-      name: string;
-      state: string;
-      shortDetail?: string;
-    };
-    displayClock?: string;
-    period: number;
-  };
-  competitions: Array<{
-    competitors: Array<{
-      id: string;
-      homeAway: string;
-      score: string;
-      team: {
-        id: string;
-        name: string;
-        displayName: string;
-        abbreviation: string;
-        color?: string;
-        alternateColor?: string;
-        logo?: string;
-      };
-      records?: Array<{ summary: string }>;
-    }>;
-    venue?: {
-      fullName: string;
-    };
-  }>;
-}
+// (duplicate ESPNGame interface removed)
 
 // Use displayClock when formatting live periods for football and soccer
 function convertESPNGame(espnGame: ESPNGame, sport: 'football' | 'soccer' | 'baseball'): Game {
@@ -170,7 +140,9 @@ function convertESPNGame(espnGame: ESPNGame, sport: 'football' | 'soccer' | 'bas
       // baseball
       // ESPN often provides a useful shortDetail like "Top 5th"
       const short = espnGame.status.type.shortDetail;
-      period = short || `Inning ${currentPeriod}`;
+      const outs = competition.situation?.outs;
+      const baseLabel = short || `Inning ${currentPeriod}`;
+      period = typeof outs === 'number' ? `${baseLabel} - ${outs} ${outs === 1 ? 'Out' : 'Outs'}` : baseLabel;
     }
   } else if (espnGame.status.type.state === 'post') {
     time = 'Final';

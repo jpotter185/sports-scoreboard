@@ -234,20 +234,7 @@
     color: #9ca3af;
   }
   
-  .team-type {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-  }
-  
-  .away-type {
-    color: #6b7280;
-  }
-  
-  .home-type {
-    color: #6b7280;
-  }
+  /* removed unused team-type styles */
   
   .team-score {
     font-size: 24px;
@@ -294,6 +281,34 @@
   .date-text {
     font-size: 11px;
     color: #6b7280;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .game-card {
+      padding: 12px;
+      min-height: 150px;
+      border-radius: 10px;
+    }
+    .status-header {
+      margin-bottom: 10px;
+    }
+    .status-icon { font-size: 16px; }
+    .status-main { font-size: 11px; }
+    .status-sub { font-size: 10px; }
+    .venue-info { display: none; }
+    .teams-container { gap: 8px; }
+    .team-card { padding: 10px; }
+    .team-logo { width: 28px; height: 28px; }
+    .team-city { font-size: 13px; }
+    .team-name { font-size: 11px; }
+    .team-record { font-size: 10px; }
+    .team-score { font-size: 20px; }
+    .winning-score { font-size: 24px; }
+    .vs-badge { padding: 2px 8px; }
+    .vs-text { font-size: 12px; }
+    .game-date { margin-top: 12px; padding-top: 8px; }
+    .date-text { font-size: 10px; }
   }
   
   .status-message {
@@ -369,7 +384,7 @@
         <div class="team-info">
           <div class="team-logo" style="background: {awayTeamColor}">
             {#if game.awayTeam.logo}
-              <img src={game.awayTeam.logo} alt="{game.awayTeam.name} logo" />
+              <img src={game.awayTeam.logo} alt="{game.awayTeam.name} logo" loading="lazy" decoding="async" width="36" height="36" />
             {:else}
               <div class="team-logo-fallback" style="color: {awayTextColor}">
                 {game.awayTeam.abbreviation}
@@ -410,7 +425,7 @@
         <div class="team-info">
           <div class="team-logo" style="background: {homeTeamColor}">
             {#if game.homeTeam.logo}
-              <img src={game.homeTeam.logo} alt="{game.homeTeam.name} logo" />
+              <img src={game.homeTeam.logo} alt="{game.homeTeam.name} logo" loading="lazy" decoding="async" width="36" height="36" />
             {:else}
               <div class="team-logo-fallback" style="color: {homeTextColor}">
                 {game.homeTeam.abbreviation}

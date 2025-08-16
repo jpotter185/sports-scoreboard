@@ -14,6 +14,7 @@
   let orderedLeagues: League[] = [];
   let dragOverId: string | null = null;
   let dragOverPosition: 'before' | 'after' | null = null;
+  let reorderMode = false;
 
   // Auto-refresh every 30 seconds
   onMount(async () => {
@@ -132,6 +133,17 @@
     dragOverPosition = null;
   }
 
+  function moveLeague(id: string, direction: 'up' | 'down') {
+    const idx = leagueOrder.indexOf(id);
+    if (idx === -1) return;
+    const target = direction === 'up' ? idx - 1 : idx + 1;
+    if (target < 0 || target >= leagueOrder.length) return;
+    const updated = [...leagueOrder];
+    const [item] = updated.splice(idx, 1);
+    updated.splice(target, 0, item);
+    leagueOrder = updated;
+  }
+
   async function refreshData() {
     await loadData({ background: true });
   }
@@ -188,6 +200,17 @@
 
   .refresh-button:active {
     transform: translateY(0);
+  }
+
+  .reorder-toggle {
+    margin-left: 8px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
   }
 
   .stats-bar {
@@ -324,6 +347,19 @@
     color: #9ca3af;
   }
 
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .container { padding: 12px; }
+    .header { margin-bottom: 12px; }
+    .title { font-size: 1.25rem; }
+    .subtitle { font-size: 0.8rem; margin-bottom: 10px; }
+    .refresh-button { padding: 6px 12px; font-size: 0.8rem; }
+    .stats-bar { border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-number { font-size: 1.25rem; }
+    .stat-label { font-size: 0.75rem; }
+  }
+
   /* Drag-and-drop visuals */
   .league-draggable {
     position: relative;
@@ -355,11 +391,12 @@
 <div class="container">
   <!-- Header -->
   <div class="header">
-    <h1 class="title">NFL, MLS & EPL Live Scores</h1>
+    <h1 class="title">NFL, MLS, MLB & EPL Live Scores</h1>
     <p class="subtitle">Real-time updates from ESPN</p>
     <button class="refresh-button" on:click={refreshData}>
       {refreshing ? 'Refreshing…' : 'Refresh Now'}
     </button>
+    
     <div class="last-updated">
         <div class="last-updated-text">
           <span>🕒</span>
@@ -400,19 +437,26 @@
           <div class="stat-label">Final Games</div>
         </div>
       </div>
-
+      <div style="display:flex; justify-content:center; margin-top: 12px;">
+        <button class="reorder-toggle" on:click={() => (reorderMode = !reorderMode)}>
+          {reorderMode ? 'Done Reordering' : 'Reorder Leagues'}
+        </button>
+      </div>
     </div>
 
     <!-- Leagues -->
     {#if orderedLeagues.length > 0}
       {#each orderedLeagues as league (league.id)}
-        <div class="league-draggable {draggingId === league.id ? 'dragging' : ''}" on:dragstart={(e) => onDragStart(e, league.id)} on:dragover={(e) => onDragOver(e, league.id)} on:drop={onDrop} on:dragend={onDragEnd}>
+        <div class="league-draggable {draggingId === league.id ? 'dragging' : ''}" role="listitem" aria-grabbed={draggingId === league.id} on:dragstart={(e) => onDragStart(e, league.id)} on:dragover={(e) => onDragOver(e, league.id)} on:drop={onDrop} on:dragend={onDragEnd}>
           {#if dragOverId === league.id && dragOverPosition === 'before'}
-            <div class="drop-indicator show"><div class="drop-line" /></div>
+            <div class="drop-indicator show"><div class="drop-line"></div></div>
           {/if}
-          <LeagueSection {league} forceCollapse={draggingId !== null} />
+          <LeagueSection {league} {reorderMode} forceCollapse={draggingId !== null || reorderMode}
+            on:moveUp={() => moveLeague(league.id, 'up')}
+            on:moveDown={() => moveLeague(league.id, 'down')}
+            on:exitReorder={() => (reorderMode = false)} />
           {#if dragOverId === league.id && dragOverPosition === 'after'}
-            <div class="drop-indicator show"><div class="drop-line" /></div>
+            <div class="drop-indicator show"><div class="drop-line"></div></div>
           {/if}
         </div>
       {/each}
@@ -427,6 +471,6 @@
 
   <!-- Footer -->
   <div class="footer">
-    <p>Powered by public ESPN APIs • Auto-refreshes every 30 seconds</p>
+    <p>Powered by Public ESPN APIs • Auto-refreshes every 30 seconds</p>
   </div>
 </div>

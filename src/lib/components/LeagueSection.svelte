@@ -1,14 +1,16 @@
 <script lang="ts">
   import type { League } from '$lib/types';
   import GameCard from './GameCard.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
   import { browser } from '$app/environment';
 
   export let league: League;
   export let forceCollapse: boolean = false;
+  export let reorderMode: boolean = false;
   let collapsed = false;
   $: isCollapsed = collapsed || forceCollapse;
+  const dispatch = createEventDispatcher();
 
   // Read initial collapsed state synchronously on the client to avoid flicker on first paint
   if (browser) {
@@ -119,6 +121,23 @@
     cursor: grabbing;
   }
 
+  .right-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reorder-btn {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
   .chevron.rotate {
     transform: rotate(-90deg);
   }
@@ -149,7 +168,7 @@
   
   .games-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
   }
 
@@ -189,6 +208,15 @@
   .no-games-subtitle {
     font-size: 14px;
   }
+
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .league-title { font-size: 20px; }
+    .collapse-button { padding: 6px 10px; font-size: 13px; }
+    .meta-item { font-size: 13px; }
+    .games-grid { grid-template-columns: 1fr; gap: 12px; }
+    .drag-handle { display: none; }
+  }
 </style>
 
 <div class="league-section">
@@ -196,7 +224,7 @@
   <div class="league-header">
     <div class="header-top">
       <div class="left-header">
-        <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" tabindex="0" draggable="true">
+        <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" draggable="true">
           <!-- Grip icon -->
           <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor" aria-hidden="true">
             <circle cx="6" cy="6" r="1.5" />
@@ -209,12 +237,18 @@
         </span>
         <h2 class="league-title">{league.name}</h2>
       </div>
-      <button class="collapse-button" on:click={toggleCollapse} aria-expanded={!isCollapsed} aria-controls={`grid-${league.id}`}>
-        <svg class="chevron" class:rotate={isCollapsed} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-        </svg>
-        {isCollapsed ? 'Expand' : 'Collapse'}
-      </button>
+      <div class="right-controls">
+        {#if reorderMode}
+          <button class="reorder-btn" on:click={() => dispatch('moveUp')}>↑</button>
+          <button class="reorder-btn" on:click={() => dispatch('moveDown')}>↓</button>
+        {/if}
+        <button class="collapse-button" on:click={() => { if (reorderMode) dispatch('exitReorder'); toggleCollapse(); }} aria-expanded={!isCollapsed} aria-controls={`grid-${league.id}`}>
+          <svg class="chevron" class:rotate={isCollapsed} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+          </svg>
+          {isCollapsed ? 'Expand' : 'Collapse'}
+        </button>
+      </div>
     </div>
     <div class="league-meta">
       <div class="meta-item">
