@@ -8,8 +8,11 @@
   export let league: League;
   export let forceCollapse: boolean = false;
   export let reorderMode: boolean = false;
+  export let forceExpand: boolean = false;
   let collapsed = false;
-  $: isCollapsed = collapsed || forceCollapse;
+  // Apply jump-driven overrides to the real collapsed state
+  $: if (forceExpand) collapsed = false;
+  $: if (forceCollapse) collapsed = true;
   const dispatch = createEventDispatcher();
 
   // Read initial collapsed state synchronously on the client to avoid flicker on first paint
@@ -219,7 +222,7 @@
   }
 </style>
 
-<div class="league-section">
+<div class="league-section" id={`league-${league.id}`}>
   <!-- League Header -->
   <div class="league-header">
     <div class="header-top">
@@ -242,11 +245,11 @@
           <button class="reorder-btn" on:click={() => dispatch('moveUp')}>↑</button>
           <button class="reorder-btn" on:click={() => dispatch('moveDown')}>↓</button>
         {/if}
-        <button class="collapse-button" on:click={() => { if (reorderMode) dispatch('exitReorder'); toggleCollapse(); }} aria-expanded={!isCollapsed} aria-controls={`grid-${league.id}`}>
-          <svg class="chevron" class:rotate={isCollapsed} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <button class="collapse-button" on:click={() => { if (reorderMode) dispatch('exitReorder'); dispatch('clearJump'); toggleCollapse(); }} aria-expanded={!collapsed} aria-controls={`grid-${league.id}`}>
+          <svg class="chevron" class:rotate={collapsed} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
           </svg>
-          {isCollapsed ? 'Expand' : 'Collapse'}
+          {collapsed ? 'Expand' : 'Collapse'}
         </button>
       </div>
     </div>
@@ -277,11 +280,19 @@
           <span>{league.games.filter(g => g.status === 'live').length} live</span>
         </div>
       {/if}
+
+      {#if league.games.filter(g => g.status === 'final').length > 0}
+        <span class="meta-divider">•</span>
+        <div class="meta-item">
+          <span class="meta-icon">✅</span>
+          <span>{league.games.filter(g => g.status === 'final').length} final</span>
+        </div>
+      {/if}
     </div>
   </div>
 
   <!-- Games Grid -->
-  {#if !isCollapsed}
+  {#if !collapsed}
     <div class="league-body" id={`grid-${league.id}`} in:slide={{ duration: 180 }} out:slide={{ duration: 140 }}>
       {#if league.games.length > 0}
         <div class="games-grid">

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getScoreboardData } from '$lib/data';
   import LeagueSection from '$lib/components/LeagueSection.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
 
@@ -15,6 +15,18 @@
   let dragOverId: string | null = null;
   let dragOverPosition: 'before' | 'after' | null = null;
   let reorderMode = false;
+  let liveOnly = false;
+  let jumpTarget: string | null = null;
+  async function onJumpLeague(id: string) {
+    reorderMode = false;
+    jumpTarget = id;
+    await tick();
+    // Scroll after expand transition has started
+    setTimeout(() => {
+      const el = document.getElementById(`league-${id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 220); // slightly longer than in:slide duration
+  }
 
   // Auto-refresh every 30 seconds
   onMount(async () => {
@@ -23,6 +35,12 @@
     const interval = setInterval(async () => {
       await loadData({ background: true });
     }, 30000);
+
+    // restore liveOnly preference
+    try {
+      const savedLive = localStorage.getItem('liveOnly');
+      if (savedLive != null) liveOnly = savedLive === '1';
+    } catch {}
 
     return () => clearInterval(interval);
   });
@@ -84,8 +102,19 @@
     } catch {}
   }
 
+  // persist liveOnly
+  $: if (browser) {
+    try { localStorage.setItem('liveOnly', liveOnly ? '1' : '0'); } catch {}
+  }
+
+  // Apply live-only filtering to leagues/games for display
+  $: filteredLeagues = scoreboardData.leagues.map((l) => ({
+    ...l,
+    games: liveOnly ? l.games.filter((g) => g.status === 'live') : l.games
+  })).filter((l) => (liveOnly ? l.games.length > 0 : true));
+
   $: orderedLeagues = leagueOrder
-    .map((id) => scoreboardData.leagues.find((l) => l.id === id))
+    .map((id) => filteredLeagues.find((l) => l.id === id))
     .filter((l): l is League => !!l);
 
   function onDragStart(event: DragEvent, id: string) {
@@ -360,6 +389,31 @@
     .stat-label { font-size: 0.75rem; }
   }
 
+  /* League jump nav */
+  :global(html) { scroll-behavior: smooth; }
+
+  .leagues-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 8px 0 16px 0;
+  }
+
+  .nav-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    background: #f8fafc;
+    color: #334155;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
   /* Drag-and-drop visuals */
   .league-draggable {
     position: relative;
@@ -437,9 +491,20 @@
           <div class="stat-label">Final Games</div>
         </div>
       </div>
-      <div style="display:flex; justify-content:center; margin-top: 12px;">
+      <div class="leagues-nav">
+        {#each orderedLeagues as l (l.id)}
+          <a class="nav-chip" href={`#league-${l.id}`} on:click|preventDefault={() => onJumpLeague(l.id)}>
+            {l.id === 'nfl' ? '🏈 NFL' : l.id === 'mls' ? '⚽ MLS' : l.id === 'mlb' ? '⚾ MLB' : '⚽ EPL'}
+          </a>
+        {/each}
+      </div>
+
+      <div style="display:flex; justify-content:center; gap:12px; margin-top: 8px; flex-wrap: wrap;">
         <button class="reorder-toggle" on:click={() => (reorderMode = !reorderMode)}>
           {reorderMode ? 'Done Reordering' : 'Reorder Leagues'}
+        </button>
+        <button class="reorder-toggle" on:click={() => (liveOnly = !liveOnly)} aria-pressed={liveOnly}>
+          {liveOnly ? 'Show All Games' : 'Show Live Only'}
         </button>
       </div>
     </div>
@@ -451,10 +516,13 @@
           {#if dragOverId === league.id && dragOverPosition === 'before'}
             <div class="drop-indicator show"><div class="drop-line"></div></div>
           {/if}
-          <LeagueSection {league} {reorderMode} forceCollapse={draggingId !== null || reorderMode}
+          <LeagueSection {league} {reorderMode}
+            forceCollapse={draggingId !== null || reorderMode || (jumpTarget && jumpTarget !== league.id)}
+            forceExpand={jumpTarget === league.id}
             on:moveUp={() => moveLeague(league.id, 'up')}
             on:moveDown={() => moveLeague(league.id, 'down')}
-            on:exitReorder={() => (reorderMode = false)} />
+            on:exitReorder={() => (reorderMode = false)}
+            on:clearJump={() => { if (jumpTarget === league.id) jumpTarget = null; }} />
           {#if dragOverId === league.id && dragOverPosition === 'after'}
             <div class="drop-indicator show"><div class="drop-line"></div></div>
           {/if}
