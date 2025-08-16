@@ -1,164 +1,97 @@
-# 🏈 Sports Scoreboard - NFL & MLS
+# ⚽🏈⚾ Sports Scoreboard (SvelteKit)
 
-A modern, responsive sports scoreboard application built with SvelteKit that displays live scores and game updates for NFL and MLS.
+Live scoreboard for NFL, MLS, EPL, and MLB using ESPN’s public scoreboard endpoints. Responsive, auto-refreshing, and fast to deploy.
 
 ## ✨ Features
 
-- **Live Score Updates** - Real-time game status and scores
-- **Multiple Leagues** - NFL and MLS support
-- **Responsive Design** - Works on all devices
-- **Auto-refresh** - Updates every 30 seconds
-- **Game Status Tracking** - Live, Final, Scheduled, Postponed, Cancelled
-- **Team Colors** - Official team colors for visual appeal
-- **Loading States** - Smooth user experience with loading indicators
+- **Leagues**: NFL (🏈), MLS/EPL (⚽), MLB (⚾)
+- **Real-time-ish**: Auto-refresh every 30s with in-place updates (no layout jump)
+- **Clickable games**: Each card links to the ESPN game page
+- **Status-aware UI**: Scheduled, Live, Final styling; soccer halves vs. football quarters; MLB Top/Bottom inning
+- **Logos & colors**: Pulled dynamically from ESPN; neutral fallback if missing
+- **Cleaner cards**: Away @ Home format, scores hidden when scheduled, unified date/time at bottom
+- **Winner/loser states**: Winner highlighted; loser/tie grayed
+- **League UX**: Collapsible sections with persistence; drag-and-drop reorder with a grab handle (order persists)
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Node.js 18+
 
-### Installation
-
-1. Clone the repository:
+### Install & Run
 ```bash
 git clone <your-repo-url>
 cd sports-scoreboard
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start the development server:
-```bash
 npm run dev
+# open http://localhost:5173
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+## 🔌 Data Sources
 
-## 🔌 API Integration
+Uses ESPN’s public scoreboard endpoints (no API key):
+- NFL: `https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`
+- MLS: `https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard`
+- EPL: `https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard`
+- MLB: `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard`
 
-The app is currently using mock data for demonstration. To integrate with real sports APIs:
-
-### Option 1: SportsData.io (Recommended)
-1. Sign up for a free API key at [sportsdata.io](https://sportsdata.io/)
-2. Update the `API_KEY` constant in `src/lib/api.ts`
-3. Uncomment the real API functions in the same file
-
-### Option 2: ESPN API
-- ESPN provides some free sports data
-- Update the API endpoints in `src/lib/api.ts`
-
-### Option 3: Custom API
-- Modify the API functions to match your data source
-- Ensure the data structure matches the interfaces in `src/lib/types.ts`
+Parsing happens in `src/lib/api.ts`, then it’s aggregated in `src/lib/data.ts`.
 
 ## 🏗️ Project Structure
 
 ```
 src/
 ├── lib/
-│   ├── components/          # Reusable UI components
-│   │   ├── GameCard.svelte # Individual game display
-│   │   └── LeagueSection.svelte # League section display
-│   ├── api.ts              # API integration layer
-│   ├── data.ts             # Data management
-│   ├── types.ts            # TypeScript interfaces
-│   └── index.ts            # Main exports
-├── routes/                  # SvelteKit routes
-│   ├── +layout.svelte      # App layout
-│   └── +page.svelte        # Main scoreboard page
-└── app.css                 # Global styles with Tailwind
+│   ├── components/
+│   │   ├── GameCard.svelte         # Game tile
+│   │   └── LeagueSection.svelte    # Collapsible league section
+│   ├── api.ts                      # ESPN fetch + conversion
+│   ├── data.ts                     # Aggregate leagues & build page model
+│   ├── types.ts                    # Shared types
+│   └── index.ts
+├── routes/
+│   ├── +layout.svelte
+│   └── +page.svelte                # Main page, refresh-in-place, drag reorder
+└── app.css                         # Global styles
 ```
 
-## 🎨 Customization
+## 🧭 Usage Tips
 
-### Adding More Teams
-Update the mock data arrays in `src/lib/api.ts`:
-```typescript
-const mockNFLTeams: APITeam[] = [
-  // Add your teams here
-];
-```
+- Collapse a league via its header; state persists per league.
+- Drag with the handle (dotted grip) to reorder leagues; persisted in localStorage.
+- Click a game card to view it on ESPN.
 
-### Team Colors
-Modify the `getTeamColors` function in `src/lib/api.ts` to add custom team colors.
+## ☁️ Deploy (Vercel)
 
-### Adding New Leagues
-1. Create new team and game data
-2. Add the league to the `getScoreboardData` function in `src/lib/data.ts`
-3. Update the types if needed
+1) Push this repo to GitHub
+2) In Vercel → New Project → Import GitHub repo
+3) Framework: SvelteKit (auto), Build: default (npm run build)
+4) Deploy
 
-## 🚀 Deployment
+No env vars required. ESPN calls are HTTPS and public.
 
-### Build for Production
+CLI alternative (no GitHub):
 ```bash
-npm run build
+npm i -g vercel
+vercel
+vercel --prod
 ```
 
-### Preview Production Build
-```bash
-npm run preview
-```
+## 🛡️ Security & Notes
 
-### Deploy to Vercel/Netlify
-The app is ready for deployment to any static hosting service that supports SvelteKit.
+- No secrets are used; no user data is collected
+- Calls are client-side; if CORS ever blocks, add a small read-only proxy
+- ESPN rate limits may apply; optional backoff can be added later
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: SvelteKit 5
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
-- **Build Tool**: Vite
-- **Package Manager**: npm
-
-## 📱 Responsive Design
-
-The app is fully responsive and works on:
-- Mobile devices (320px+)
-- Tablets (768px+)
-- Desktop (1024px+)
-- Large screens (1280px+)
-
-## 🔄 Auto-refresh
-
-- Data refreshes automatically every 30 seconds
-- Manual refresh button available
-- Loading states for better UX
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+- SvelteKit 5, TypeScript, Vite
+- CSS in components (no dependency on Tailwind for cards)
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-1. Check the browser console for errors
-2. Verify your API keys are correct
-3. Ensure all dependencies are installed
-4. Open an issue on GitHub
-
-## 🎯 Roadmap
-
-- [ ] Real-time WebSocket updates
-- [ ] User preferences and favorite teams
-- [ ] Push notifications for game updates
-- [ ] Historical game data
-- [ ] Player statistics
-- [ ] More sports leagues
-- [ ] Dark mode theme
-- [ ] PWA support
+MIT
 
 ---
 
-Built with ❤️ using SvelteKit and Tailwind CSS
+Built with ❤️ using SvelteKit
