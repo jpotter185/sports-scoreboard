@@ -4,9 +4,14 @@
   import { onMount } from 'svelte';
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
-  import { injectAnalytics } from '@vercel/analytics/sveltekit'
+  import { injectAnalytics } from '@vercel/analytics/sveltekit';
   import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-  import { favoritesStore, favoriteTeams, favoriteLeagues, applyFavoriteStatus } from '$lib/favorites';
+  import {
+    favoritesStore,
+    favoriteTeams,
+    favoriteLeagues,
+    applyFavoriteStatus,
+  } from '$lib/favorites';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -33,7 +38,7 @@
       if (!scoreboardData.leagues.length) {
         return scoreboardData;
       }
-      
+
       // Since components now handle favorites directly, just return the original data
       // The reactive logic is now handled at the component level
       return scoreboardData;
@@ -73,11 +78,9 @@
     };
   });
 
-
-
   // Derive and persist league order
   $: if (scoreboardData.leagues && scoreboardData.leagues.length > 0) {
-    const incomingIds = scoreboardData.leagues.map((l) => l.id);
+    const incomingIds = scoreboardData.leagues.map(l => l.id);
     if (leagueOrder.length === 0) {
       if (browser) {
         try {
@@ -85,8 +88,8 @@
           if (saved) {
             const savedOrder = JSON.parse(saved) as string[];
             leagueOrder = [
-              ...savedOrder.filter((id) => incomingIds.includes(id)),
-              ...incomingIds.filter((id) => !savedOrder.includes(id))
+              ...savedOrder.filter(id => incomingIds.includes(id)),
+              ...incomingIds.filter(id => !savedOrder.includes(id)),
             ];
           } else {
             leagueOrder = incomingIds;
@@ -99,8 +102,8 @@
       }
     } else {
       leagueOrder = [
-        ...leagueOrder.filter((id) => incomingIds.includes(id)),
-        ...incomingIds.filter((id) => !leagueOrder.includes(id))
+        ...leagueOrder.filter(id => incomingIds.includes(id)),
+        ...incomingIds.filter(id => !leagueOrder.includes(id)),
       ];
     }
   }
@@ -113,32 +116,45 @@
 
   // persist liveOnly
   $: if (browser) {
-    try { localStorage.setItem('liveOnly', liveOnly ? '1' : '0'); } catch {}
+    try {
+      localStorage.setItem('liveOnly', liveOnly ? '1' : '0');
+    } catch {}
   }
 
   // persist showFavoritesOnly
   $: if (browser) {
-    try { localStorage.setItem('showFavoritesOnly', showFavoritesOnly ? '1' : '0'); } catch {}
+    try {
+      localStorage.setItem('showFavoritesOnly', showFavoritesOnly ? '1' : '0');
+    } catch {}
   }
 
   // Apply live-only filtering to leagues/games for display
-  $: filteredLeagues = scoreboardData.leagues.map((l) => ({
-    ...l,
-    games: liveOnly ? l.games.filter((g) => g.status === 'live') : l.games
-  })).filter((l) => (liveOnly ? l.games.length > 0 : true));
+  $: filteredLeagues = scoreboardData.leagues
+    .map(l => ({
+      ...l,
+      games: liveOnly ? l.games.filter(g => g.status === 'live') : l.games,
+    }))
+    .filter(l => (liveOnly ? l.games.length > 0 : true));
 
   // Apply favorites-only filtering (now using internal team IDs)
-  $: finalFilteredLeagues = showFavoritesOnly 
-    ? filteredLeagues.filter(l => $favoritesStore.leagues.includes(l.id) || l.games.some(g => {
-        const homeTeamInternalId = `${l.id}-${g.homeTeam.id}`;
-        const awayTeamInternalId = `${l.id}-${g.awayTeam.id}`;
-        return $favoritesStore.teams.includes(homeTeamInternalId) || $favoritesStore.teams.includes(awayTeamInternalId);
-      }))
+  $: finalFilteredLeagues = showFavoritesOnly
+    ? filteredLeagues.filter(
+        l =>
+          $favoritesStore.leagues.includes(l.id) ||
+          l.games.some(g => {
+            const homeTeamInternalId = `${l.id}-${g.homeTeam.id}`;
+            const awayTeamInternalId = `${l.id}-${g.awayTeam.id}`;
+            return (
+              $favoritesStore.teams.includes(homeTeamInternalId) ||
+              $favoritesStore.teams.includes(awayTeamInternalId)
+            );
+          })
+      )
     : filteredLeagues;
 
   $: orderedLeagues = (() => {
     const result = leagueOrder
-      .map((id) => finalFilteredLeagues.find((l) => l.id === id))
+      .map(id => finalFilteredLeagues.find(l => l.id === id))
       .filter((l): l is League => !!l);
     return result;
   })();
@@ -166,7 +182,7 @@
     dragOverId = overId;
 
     // Preview order while dragging
-    const withoutDragging = leagueOrder.filter((id) => id !== draggingId);
+    const withoutDragging = leagueOrder.filter(id => id !== draggingId);
     let insertIndex = withoutDragging.indexOf(overId);
     if (insertIndex === -1) return;
     if (dragOverPosition === 'after') insertIndex += 1;
@@ -206,30 +222,212 @@
   }
 
   $: totalGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.length, 0);
-  $: liveGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.filter(g => g.status === 'live').length, 0);
-  $: finalGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.filter(g => g.status === 'final').length, 0);
+  $: liveGames = scoreboardData.leagues.reduce(
+    (sum, league) => sum + league.games.filter(g => g.status === 'live').length,
+    0
+  );
+  $: finalGames = scoreboardData.leagues.reduce(
+    (sum, league) => sum + league.games.filter(g => g.status === 'final').length,
+    0
+  );
   $: favoriteTeamsCount = $favoriteTeams.length;
   $: favoriteLeaguesCount = $favoriteLeagues.length;
 
   // Function to get team info from internal team ID
   function getTeamInfo(internalTeamId: string) {
     if (!internalTeamId.includes('-')) return null;
-    
+
     const [leagueId, espnId] = internalTeamId.split('-');
     const league = scoreboardData.leagues.find(l => l.id === leagueId);
     if (!league) return null;
-    
+
     const team = league.teams.find(t => t.id === espnId);
     if (!team) return null;
-    
+
     return {
       leagueId,
       espnId,
       team,
-      leagueName: league.name
+      leagueName: league.name,
     };
   }
 </script>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1 class="title">NFL, MLS, MLB & EPL Live Scores</h1>
+    <p class="subtitle">Real-time updates from ESPN</p>
+    <button class="refresh-button" on:click={refreshData}>
+      {refreshing ? 'Refreshing…' : 'Refresh Now'}
+    </button>
+
+    <div class="last-updated">
+      <div class="last-updated-text">
+        <span>🕒</span>
+        <span>Last updated: {scoreboardData.lastUpdated}</span>
+      </div>
+    </div>
+  </div>
+
+  {#if loading}
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+  {:else if error}
+    <div class="error-message">
+      <div class="error-title">⚠️ {error}</div>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
+    </div>
+  {:else}
+    <!-- League Jump Nav & Controls -->
+    <div class="stats-bar">
+      <div class="leagues-nav">
+        {#each orderedLeagues as l (l.id)}
+          <a class="nav-chip" href="/league/{l.id}">
+            {l.id === 'nfl'
+              ? '🏈 NFL'
+              : l.id === 'mls'
+                ? '⚽ MLS'
+                : l.id === 'mlb'
+                  ? '⚾ MLB'
+                  : '⚽ EPL'}
+          </a>
+        {/each}
+      </div>
+
+      <div
+        style="display:flex; justify-content:center; gap:12px; margin-top: 8px; flex-wrap: wrap;"
+      >
+        <button class="reorder-toggle" on:click={() => (reorderMode = !reorderMode)}>
+          {reorderMode ? 'Done Reordering' : 'Reorder Leagues'}
+        </button>
+        <button
+          class="reorder-toggle"
+          on:click={() => (liveOnly = !liveOnly)}
+          aria-pressed={liveOnly}
+        >
+          {liveOnly ? 'Show All Games' : 'Show Live Only'}
+        </button>
+        <button
+          class="reorder-toggle"
+          on:click={() => (showFavoritesOnly = !showFavoritesOnly)}
+          aria-pressed={showFavoritesOnly}
+        >
+          {showFavoritesOnly ? 'Show All Teams' : 'Show Favorites Only'}
+        </button>
+      </div>
+
+      <!-- My Favorite Teams Section -->
+      {#if favoriteTeamsCount > 0}
+        <div class="favorite-teams-section">
+          <div class="favorite-teams-header">
+            <h2 class="section-title">⭐ My Favorite Teams</h2>
+            <button
+              class="collapse-button"
+              on:click={() => (showFavoriteTeams = !showFavoriteTeams)}
+              aria-expanded={showFavoriteTeams}
+            >
+              <svg
+                class="chevron"
+                class:rotate={!showFavoriteTeams}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              {showFavoriteTeams ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+
+          {#if showFavoriteTeams}
+            <div class="favorite-teams-grid">
+              {#each $favoritesStore.teams as internalTeamId}
+                {@const teamInfo = getTeamInfo(internalTeamId)}
+                {#if teamInfo}
+                  <div class="favorite-team-card">
+                    <a
+                      href="/team/{teamInfo.leagueId}/{teamInfo.espnId}?backTo=/"
+                      class="team-link"
+                    >
+                      <div class="team-logo">
+                        {#if teamInfo.team.logo}
+                          <img
+                            src={teamInfo.team.logo}
+                            alt="{teamInfo.team.name} logo"
+                            loading="lazy"
+                          />
+                        {:else}
+                          <div class="team-logo-fallback">
+                            {teamInfo.team.abbreviation}
+                          </div>
+                        {/if}
+                      </div>
+                      <div class="team-info">
+                        <div class="team-name">{teamInfo.team.name}</div>
+                        <div class="team-league">{teamInfo.leagueName}</div>
+                        {#if teamInfo.team.record}
+                          <div class="team-record">{teamInfo.team.record}</div>
+                        {/if}
+                      </div>
+                    </a>
+                    <FavoriteButton
+                      isFavorite={true}
+                      size="small"
+                      on:toggle={() => favoritesStore.toggleTeam(internalTeamId)}
+                    />
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+
+    <!-- Leagues -->
+    {#if orderedLeagues.length > 0}
+      {#each orderedLeagues as league (league.id)}
+        <div
+          class="league-draggable {draggingId === league.id ? 'dragging' : ''}"
+          role="listitem"
+          aria-grabbed={draggingId === league.id}
+          on:dragstart={e => onDragStart(e, league.id)}
+          on:dragover={e => onDragOver(e, league.id)}
+          on:drop={onDrop}
+          on:dragend={onDragEnd}
+        >
+          <LeagueSection
+            {league}
+            {reorderMode}
+            forceCollapse={draggingId !== null || reorderMode}
+            showTeams={false}
+            {showFavoritesOnly}
+            on:moveUp={() => moveLeague(league.id, 'up')}
+            on:moveDown={() => moveLeague(league.id, 'down')}
+            on:exitReorder={() => (reorderMode = false)}
+          />
+        </div>
+      {/each}
+    {:else}
+      <div class="no-games">
+        <div class="no-games-icon">🏟️</div>
+        <div class="no-games-title">No games available</div>
+        <div class="no-games-subtitle">Check back later for upcoming games</div>
+      </div>
+    {/if}
+  {/if}
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Powered by Public ESPN APIs • Auto-refreshes every 30 seconds</p>
+  </div>
+</div>
 
 <style>
   .container {
@@ -242,20 +440,20 @@
     text-align: center;
     margin-bottom: 20px;
   }
-  
+
   .title {
     font-size: 1.75rem;
     font-weight: bold;
     color: #111827;
     margin-bottom: 4px;
   }
-  
+
   .subtitle {
     font-size: 0.9rem;
     color: #6b7280;
     margin-bottom: 16px;
   }
-  
+
   .refresh-button {
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
     color: white;
@@ -335,8 +533,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -399,17 +601,35 @@
 
   /* Mobile adjustments */
   @media (max-width: 480px) {
-    .container { padding: 12px; }
-    .header { margin-bottom: 12px; }
-    .title { font-size: 1.25rem; }
-    .subtitle { font-size: 0.8rem; margin-bottom: 10px; }
-    .refresh-button { padding: 6px 12px; font-size: 0.8rem; }
-    .stats-bar { border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .container {
+      padding: 12px;
+    }
+    .header {
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 1.25rem;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+    .refresh-button {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    .stats-bar {
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
     /* removed old stats grid styles */
   }
 
   /* League jump nav */
-  :global(html) { scroll-behavior: smooth; }
+  :global(html) {
+    scroll-behavior: smooth;
+  }
 
   .leagues-nav {
     display: flex;
@@ -593,133 +813,3 @@
     margin: 0;
   }
 </style>
-
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <h1 class="title">NFL, MLS, MLB & EPL Live Scores</h1>
-    <p class="subtitle">Real-time updates from ESPN</p>
-    <button class="refresh-button" on:click={refreshData}>
-      {refreshing ? 'Refreshing…' : 'Refresh Now'}
-    </button>
-    
-    <div class="last-updated">
-        <div class="last-updated-text">
-          <span>🕒</span>
-          <span>Last updated: {scoreboardData.lastUpdated}</span>
-        </div>
-      </div>
-  </div>
-
-  {#if loading}
-    <div class="loading-spinner">
-      <div class="spinner"></div>
-    </div>
-  {:else if error}
-    <div class="error-message">
-      <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
-    </div>
-  {:else}
-    <!-- League Jump Nav & Controls -->
-    <div class="stats-bar">
-      <div class="leagues-nav">
-        {#each orderedLeagues as l (l.id)}
-          <a class="nav-chip" href="/league/{l.id}">
-            {l.id === 'nfl' ? '🏈 NFL' : l.id === 'mls' ? '⚽ MLS' : l.id === 'mlb' ? '⚾ MLB' : '⚽ EPL'}
-          </a>
-        {/each}
-      </div>
-
-      <div style="display:flex; justify-content:center; gap:12px; margin-top: 8px; flex-wrap: wrap;">
-        <button class="reorder-toggle" on:click={() => (reorderMode = !reorderMode)}>
-          {reorderMode ? 'Done Reordering' : 'Reorder Leagues'}
-        </button>
-        <button class="reorder-toggle" on:click={() => (liveOnly = !liveOnly)} aria-pressed={liveOnly}>
-          {liveOnly ? 'Show All Games' : 'Show Live Only'}
-        </button>
-        <button class="reorder-toggle" on:click={() => (showFavoritesOnly = !showFavoritesOnly)} aria-pressed={showFavoritesOnly}>
-          {showFavoritesOnly ? 'Show All Teams' : 'Show Favorites Only'}
-        </button>
-      </div>
-
-      <!-- My Favorite Teams Section -->
-      {#if favoriteTeamsCount > 0}
-        <div class="favorite-teams-section">
-          <div class="favorite-teams-header">
-            <h2 class="section-title">⭐ My Favorite Teams</h2>
-            <button class="collapse-button" on:click={() => showFavoriteTeams = !showFavoriteTeams} aria-expanded={showFavoriteTeams}>
-              <svg class="chevron" class:rotate={!showFavoriteTeams} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-              </svg>
-              {showFavoriteTeams ? 'Collapse' : 'Expand'}
-            </button>
-          </div>
-          
-          {#if showFavoriteTeams}
-            <div class="favorite-teams-grid">
-              {#each $favoritesStore.teams as internalTeamId}
-                {@const teamInfo = getTeamInfo(internalTeamId)}
-                {#if teamInfo}
-                  <div class="favorite-team-card">
-                    <a href="/team/{teamInfo.leagueId}/{teamInfo.espnId}" class="team-link">
-                      <div class="team-logo">
-                        {#if teamInfo.team.logo}
-                          <img src={teamInfo.team.logo} alt="{teamInfo.team.name} logo" loading="lazy" />
-                        {:else}
-                          <div class="team-logo-fallback">
-                            {teamInfo.team.abbreviation}
-                          </div>
-                        {/if}
-                      </div>
-                      <div class="team-info">
-                        <div class="team-name">{teamInfo.team.name}</div>
-                        <div class="team-league">{teamInfo.leagueName}</div>
-                        {#if teamInfo.team.record}
-                          <div class="team-record">{teamInfo.team.record}</div>
-                        {/if}
-                      </div>
-                    </a>
-                    <FavoriteButton 
-                      isFavorite={true}
-                      size="small"
-                      on:toggle={() => favoritesStore.toggleTeam(internalTeamId)}
-                    />
-                  </div>
-                {/if}
-              {/each}
-            </div>
-          {/if}
-        </div>
-      {/if}
-    </div>
-
-    <!-- Leagues -->
-    {#if orderedLeagues.length > 0}
-      {#each orderedLeagues as league (league.id)}
-        <div class="league-draggable {draggingId === league.id ? 'dragging' : ''}" role="listitem" aria-grabbed={draggingId === league.id} on:dragstart={(e) => onDragStart(e, league.id)} on:dragover={(e) => onDragOver(e, league.id)} on:drop={onDrop} on:dragend={onDragEnd}>
-          <LeagueSection {league} {reorderMode}
-            forceCollapse={draggingId !== null || reorderMode}
-            showTeams={false}
-            {showFavoritesOnly}
-            on:moveUp={() => moveLeague(league.id, 'up')}
-            on:moveDown={() => moveLeague(league.id, 'down')}
-            on:exitReorder={() => (reorderMode = false)} />
-        </div>
-      {/each}
-    {:else}
-      <div class="no-games">
-        <div class="no-games-icon">🏟️</div>
-        <div class="no-games-title">No games available</div>
-        <div class="no-games-subtitle">Check back later for upcoming games</div>
-      </div>
-    {/if}
-  {/if}
-
-  <!-- Footer -->
-  <div class="footer">
-    <p>Powered by Public ESPN APIs • Auto-refreshes every 30 seconds</p>
-  </div>
-</div>

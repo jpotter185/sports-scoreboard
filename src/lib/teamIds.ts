@@ -11,7 +11,7 @@ export function convertToInternalTeam(leagueId: string, team: Team): InternalTea
     internalId: generateInternalTeamId(leagueId, team.id),
     espnId: team.id,
     leagueId,
-    team
+    team,
   };
 }
 
@@ -21,9 +21,11 @@ export function convertFromInternalTeam(internalTeam: InternalTeam): Team {
 }
 
 // Build translation layer from leagues data
-export function buildTeamIdTranslation(leagues: Array<{ id: string; teams: Team[] }>): TeamIdTranslation {
+export function buildTeamIdTranslation(
+  leagues: Array<{ id: string; teams: Team[] }>
+): TeamIdTranslation {
   const translation: TeamIdTranslation = {};
-  
+
   leagues.forEach(league => {
     league.teams.forEach(team => {
       if (!translation[team.id]) {
@@ -32,35 +34,41 @@ export function buildTeamIdTranslation(leagues: Array<{ id: string; teams: Team[
       translation[team.id][league.id] = generateInternalTeamId(league.id, team.id);
     });
   });
-  
+
   return translation;
 }
 
 // Convert ESPN team ID to internal ID
-export function getInternalTeamId(translation: TeamIdTranslation, espnId: string, leagueId: string): string | null {
+export function getInternalTeamId(
+  translation: TeamIdTranslation,
+  espnId: string,
+  leagueId: string
+): string | null {
   return translation[espnId]?.[leagueId] || null;
 }
 
 // Convert internal team ID back to ESPN ID and league ID
-export function parseInternalTeamId(internalId: string): { espnId: string; leagueId: string } | null {
+export function parseInternalTeamId(
+  internalId: string
+): { espnId: string; leagueId: string } | null {
   const parts = internalId.split('-');
   if (parts.length !== 2) return null;
-  
+
   const [leagueId, espnId] = parts;
   return { leagueId, espnId };
 }
 
 // Migrate existing favorites from ESPN IDs to internal IDs
 export function migrateFavoritesToInternalIds(
-  oldFavoriteTeams: string[], 
+  oldFavoriteTeams: string[],
   translation: TeamIdTranslation
 ): string[] {
   const migrated: string[] = [];
-  
+
   oldFavoriteTeams.forEach(espnId => {
     // Find all leagues that have this team ID
     const leagueIds = Object.keys(translation[espnId] || {});
-    
+
     if (leagueIds.length > 0) {
       // For now, just add the first one we find
       // In the future, we could ask the user which league they meant
@@ -71,6 +79,6 @@ export function migrateFavoritesToInternalIds(
       }
     }
   });
-  
+
   return migrated;
 }

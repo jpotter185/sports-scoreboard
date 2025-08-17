@@ -41,9 +41,9 @@ export interface Stat {
 // Internal team representation with unique IDs
 export interface InternalTeam {
   internalId: string; // e.g., "mlb-17", "nfl-17"
-  espnId: string;     // ESPN's original ID
-  leagueId: string;   // e.g., "mlb", "nfl"
-  team: Team;         // Original team data
+  espnId: string; // ESPN's original ID
+  leagueId: string; // e.g., "mlb", "nfl"
+  team: Team; // Original team data
 }
 
 // Translation layer for team IDs

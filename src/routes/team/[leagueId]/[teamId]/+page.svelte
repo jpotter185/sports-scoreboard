@@ -8,12 +8,12 @@
   import { favoritesStore } from '$lib/favorites';
   import { browser } from '$app/environment';
 
-  export let data: { 
-    team: Team; 
-    league: League; 
-    games: Game[]; 
-    leagueId: string; 
-    teamId: string; 
+  export let data: {
+    team: Team;
+    league: League;
+    games: Game[];
+    leagueId: string;
+    teamId: string;
   };
 
   let team: Team = data.team;
@@ -26,15 +26,14 @@
   let error: string | null = null;
 
   // Get league emoji
-  $: leagueEmoji = league?.id === 'nfl' ? '🏈' : 
-                   league?.id === 'mlb' ? '⚾' : '⚽';
+  $: leagueEmoji = league?.id === 'nfl' ? '🏈' : league?.id === 'mlb' ? '⚾' : '⚽';
 
   // Determine back navigation - prioritize going back to the league page
   $: backTo = (() => {
     // If there's a backTo query parameter, use it
     const queryBackTo = $page.url.searchParams.get('backTo');
     if (queryBackTo) return queryBackTo;
-    
+
     // Check if user came from the main page by looking at referrer
     if (browser && document.referrer) {
       const referrer = new URL(document.referrer);
@@ -43,7 +42,7 @@
         return '/';
       }
     }
-    
+
     // Otherwise, go back to the league page
     return `/league/${league.id}`;
   })();
@@ -81,10 +80,10 @@
         if (updatedTeam) {
           team = updatedTeam;
         }
-        
+
         // Update games
-        const teamGames = updatedLeague.games.filter(game => 
-          game.homeTeam.id === team.id || game.awayTeam.id === team.id
+        const teamGames = updatedLeague.games.filter(
+          game => game.homeTeam.id === team.id || game.awayTeam.id === team.id
         );
         games = [...teamGames].sort((a, b) => {
           if (!a.date || !b.date) return 0;
@@ -99,7 +98,6 @@
       loading = false;
     }
   }
-   
 </script>
 
 <svelte:head>
@@ -110,7 +108,7 @@
   <!-- Header -->
   <div class="header">
     <a href={backTo} class="back-link">{backButtonText}</a>
-    
+
     <div class="team-info">
       <div class="team-header">
         <div class="team-logo-large">
@@ -126,7 +124,8 @@
           <h1 class="team-title">{team.name}</h1>
           <div class="team-meta">
             <span class="league-badge">
-              {leagueEmoji} {league.name}
+              {leagueEmoji}
+              {league.name}
             </span>
             {#if team.city}
               <span class="city-badge">{team.city}</span>
@@ -139,8 +138,8 @@
             {/if}
           </div>
           <div class="team-actions">
-            <FavoriteButton 
-              isFavorite={isTeamFavorite} 
+            <FavoriteButton
+              isFavorite={isTeamFavorite}
               size="large"
               on:toggle={toggleTeamFavorite}
             />
@@ -157,9 +156,7 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else}
     <!-- Team Stats Section -->
@@ -181,10 +178,10 @@
           <div class="stat-label">Losses</div>
         </div>
         {#if winPercentage}
-        <div class="stat-card">
-          <div class="stat-value">{winPercentage}</div>
-          <div class="stat-label">Win %</div>
-        </div>
+          <div class="stat-card">
+            <div class="stat-value">{winPercentage}</div>
+            <div class="stat-label">Win %</div>
+          </div>
         {/if}
       </div>
     </div>
@@ -292,7 +289,8 @@
     flex-wrap: wrap;
   }
 
-  .league-badge, .city-badge {
+  .league-badge,
+  .city-badge {
     padding: 8px 16px;
     border-radius: 9999px;
     font-size: 0.9rem;
@@ -394,8 +392,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -444,8 +446,6 @@
   .no-games-subtitle {
     color: #6b7280;
   }
-
-
 
   /* Responsive Design */
   @media (max-width: 768px) {

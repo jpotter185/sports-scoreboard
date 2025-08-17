@@ -68,8 +68,8 @@
         <div class="league-header">
           <span class="league-emoji">⚾</span>
           <h1 class="league-title">{league.name}</h1>
-          <FavoriteButton 
-            isFavorite={league.isFavorite || false} 
+          <FavoriteButton
+            isFavorite={league.isFavorite || false}
             size="large"
             on:toggle={() => favoritesStore.toggleLeague(league.id)}
           />
@@ -88,44 +88,40 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
     <!-- Controls -->
     <div class="controls">
-      <button class="control-button" on:click={refreshData}>
-        🔄 Refresh
-      </button>
+      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
     </div>
 
     <!-- Standings Section -->
     <div class="standings-container">
       <div class="standings-section">
-        <button class="section-header" on:click={() => showStandings = !showStandings}>
+        <button class="section-header" on:click={() => (showStandings = !showStandings)}>
           <span class="section-title">Standings</span>
           <span class="expand-icon">{showStandings ? '−' : '+'}</span>
         </button>
-        
+
         {#if showStandings}
           <!-- MLB Standings Table -->
           <div class="mlb-standings">
             <!-- American League Divisions -->
             <div class="league-section">
-              <button class="league-header" on:click={() => showAL = !showAL}>
+              <button class="league-header" on:click={() => (showAL = !showAL)}>
                 <h2 class="league-title">American League</h2>
                 <span class="expand-icon">{showAL ? '−' : '+'}</span>
               </button>
-              
+
               {#if showAL}
                 <!-- AL East -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showALEast = !showALEast}>
+                  <button class="division-header" on:click={() => (showALEast = !showALEast)}>
                     <h3 class="division-title">AL East</h3>
                     <span class="expand-icon">{showALEast ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showALEast}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -137,23 +133,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'AL East').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'AL East')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -161,14 +161,14 @@
                     </div>
                   {/if}
                 </div>
-                
+
                 <!-- AL Central -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showALCentral = !showALCentral}>
+                  <button class="division-header" on:click={() => (showALCentral = !showALCentral)}>
                     <h3 class="division-title">AL Central</h3>
                     <span class="expand-icon">{showALCentral ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showALCentral}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -180,23 +180,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'AL Central').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'AL Central')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -204,14 +208,14 @@
                     </div>
                   {/if}
                 </div>
-                
+
                 <!-- AL West -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showALWest = !showALWest}>
+                  <button class="division-header" on:click={() => (showALWest = !showALWest)}>
                     <h3 class="division-title">AL West</h3>
                     <span class="expand-icon">{showALWest ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showALWest}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -223,23 +227,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'AL West').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'AL West')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -249,22 +257,22 @@
                 </div>
               {/if}
             </div>
-            
+
             <!-- National League Divisions -->
             <div class="league-section">
-              <button class="league-header" on:click={() => showNL = !showNL}>
+              <button class="league-header" on:click={() => (showNL = !showNL)}>
                 <h2 class="league-title">National League</h2>
                 <span class="expand-icon">{showNL ? '−' : '+'}</span>
               </button>
-              
+
               {#if showNL}
                 <!-- NL East -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showNLEast = !showNLEast}>
+                  <button class="division-header" on:click={() => (showNLEast = !showNLEast)}>
                     <h3 class="division-title">NL East</h3>
                     <span class="expand-icon">{showNLEast ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showNLEast}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -276,23 +284,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'NL East').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'NL East')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -300,14 +312,14 @@
                     </div>
                   {/if}
                 </div>
-                
+
                 <!-- NL Central -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showNLCentral = !showNLCentral}>
+                  <button class="division-header" on:click={() => (showNLCentral = !showNLCentral)}>
                     <h3 class="division-title">NL Central</h3>
                     <span class="expand-icon">{showNLCentral ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showNLCentral}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -319,23 +331,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'NL Central').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'NL Central')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -343,14 +359,14 @@
                     </div>
                   {/if}
                 </div>
-                
+
                 <!-- NL West -->
                 <div class="division-group">
-                  <button class="division-header" on:click={() => showNLWest = !showNLWest}>
+                  <button class="division-header" on:click={() => (showNLWest = !showNLWest)}>
                     <h3 class="division-title">NL West</h3>
                     <span class="expand-icon">{showNLWest ? '−' : '+'}</span>
                   </button>
-                  
+
                   {#if showNLWest}
                     <div class="mlb-table">
                       <div class="table-header">
@@ -362,23 +378,27 @@
                         <div class="div-gb">Div GB</div>
                         <div class="standing">Standing</div>
                       </div>
-                      {#each filteredTeams.filter(team => team.division === 'NL West').sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
+                      {#each filteredTeams
+                        .filter(team => team.division === 'NL West')
+                        .sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0)) as team, index (team.id)}
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
                             <img src={team.logo} alt={team.name} class="team-logo-small" />
                             <span class="team-name">{team.city} {team.name}</span>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
                           </div>
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                           <div class="standing">{team.standingSummary || ''}</div>
                         </div>
@@ -388,7 +408,7 @@
                 </div>
               {/if}
             </div>
-            
+
             <!-- Fallback: Show teams without division info -->
             {#if filteredTeams.filter(t => !t.division).length > 0}
               <div class="division-group">
@@ -409,17 +429,19 @@
                       <div class="team">
                         <img src={team.logo} alt={team.name} class="team-logo-small" />
                         <span class="team-name">{team.city} {team.name}</span>
-                        <button 
+                        <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
-                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                          title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                           {team.isFavorite ? '★' : '☆'}
                         </button>
                       </div>
                       <div class="w">{team.wins || 0}</div>
                       <div class="l">{team.losses || 0}</div>
-                      <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                      <div class="pct">
+                        {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                      </div>
                       <div class="div-gb">{team.divisionGamesBehind || 0}</div>
                       <div class="standing">{team.standingSummary || ''}</div>
                     </div>
@@ -766,13 +788,18 @@
     font-weight: 600;
   }
 
-  .mlb-standings .w, .mlb-standings .l, .mlb-standings .pct, .mlb-standings .div-gb, .mlb-standings .standing {
+  .mlb-standings .w,
+  .mlb-standings .l,
+  .mlb-standings .pct,
+  .mlb-standings .div-gb,
+  .mlb-standings .standing {
     text-align: center;
     font-weight: 600;
     color: #374151;
   }
 
-  .mlb-standings .w, .mlb-standings .l {
+  .mlb-standings .w,
+  .mlb-standings .l {
     background: #f8fafc;
     border-radius: 6px;
     padding: 4px 8px;
@@ -859,8 +886,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -934,29 +965,31 @@
     .container {
       padding: 16px;
     }
-    
+
     .league-header {
       flex-direction: column;
       gap: 12px;
       align-items: flex-start;
       padding: 10px 12px;
     }
-    
-    .mlb-standings .table-header, .mlb-standings .table-row {
+
+    .mlb-standings .table-header,
+    .mlb-standings .table-row {
       grid-template-columns: 30px 1.5fr 30px 30px 40px 30px 40px 50px 60px;
       font-size: 12px;
       padding: 8px 12px;
     }
-    
+
     .mlb-standings .league-title {
       font-size: 18px;
     }
-    
+
     .mlb-standings .division-title {
       font-size: 14px;
     }
 
-    .section-header, .division-header {
+    .section-header,
+    .division-header {
       padding: 8px 12px;
       font-size: 1rem;
     }

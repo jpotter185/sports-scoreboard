@@ -67,8 +67,8 @@
         <div class="league-header">
           <span class="league-emoji">⚽</span>
           <h1 class="league-title">{league.name}</h1>
-          <FavoriteButton 
-            isFavorite={league.isFavorite || false} 
+          <FavoriteButton
+            isFavorite={league.isFavorite || false}
             size="large"
             on:toggle={() => favoritesStore.toggleLeague(league.id)}
           />
@@ -87,26 +87,22 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
     <!-- Controls -->
     <div class="controls">
-      <button class="control-button" on:click={refreshData}>
-        🔄 Refresh
-      </button>
+      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
     </div>
 
     <!-- Standings Section -->
     <div class="standings-container">
       <div class="standings-section">
-        <button class="section-header" on:click={() => showStandings = !showStandings}>
+        <button class="section-header" on:click={() => (showStandings = !showStandings)}>
           <span class="section-title">Table</span>
           <span class="expand-icon">{showStandings ? '−' : '+'}</span>
         </button>
-        
+
         {#if showStandings}
           {#if league?.id === 'mls' && data.teams.some(team => team.conference)}
             <!-- MLS Conference Tables -->
@@ -133,14 +129,14 @@
                     <div class="table-row">
                       <div class="pos">{index + 1}</div>
                       <div class="team">
-                        <a href="/team/{league.id}/{team.id}">
+                        <a href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/soccer">
                           <img src={team.logo} alt={team.name} class="team-logo-small" />
                           <span class="team-name">{team.name}</span>
                         </a>
-                        <button 
+                        <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
-                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                          title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                           {team.isFavorite ? '★' : '☆'}
                         </button>
@@ -151,7 +147,7 @@
                       <div class="lost">{team.losses || 0}</div>
                       <div class="gf">{team.goalsFor || 0}</div>
                       <div class="ga">{team.goalsAgainst || 0}</div>
-                      <div class="gd">{(team.goalsDiff)}</div>
+                      <div class="gd">{team.goalsDiff}</div>
                       <div class="points">{team.points || 0}</div>
                     </div>
                   {/each}
@@ -180,14 +176,14 @@
                     <div class="table-row">
                       <div class="pos">{index + 1}</div>
                       <div class="team">
-                        <a href="/team/{league.id}/{team.id}">
-                        <img src={team.logo} alt={team.name} class="team-logo-small" />
-                        <span class="team-name">{team.name}</span>
-                      </a>
-                        <button 
+                        <a href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/soccer">
+                          <img src={team.logo} alt={team.name} class="team-logo-small" />
+                          <span class="team-name">{team.name}</span>
+                        </a>
+                        <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
-                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                          title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                           {team.isFavorite ? '★' : '☆'}
                         </button>
@@ -198,7 +194,7 @@
                       <div class="lost">{team.losses || 0}</div>
                       <div class="gf">{team.goalsFor || 0}</div>
                       <div class="ga">{team.goalsAgainst || 0}</div>
-                      <div class="gd">{(team.goalsDiff)}</div>
+                      <div class="gd">{team.goalsDiff}</div>
                       <div class="points">{team.points || 0}</div>
                     </div>
                   {/each}
@@ -224,14 +220,14 @@
                 <div class="table-row">
                   <div class="pos">{index + 1}</div>
                   <div class="team">
-                    <a href="/team/{league.id}/{team.id}">
+                    <a href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/soccer">
                       <img src={team.logo} alt={team.name} class="team-logo-small" />
                       <span class="team-name">{team.name}</span>
                     </a>
-                    <button 
+                    <button
                       class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                       on:click={() => favoritesStore.toggleTeam(team.id)}
-                      title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                      title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                     >
                       {team.isFavorite ? '★' : '☆'}
                     </button>
@@ -242,7 +238,7 @@
                   <div class="lost">{team.losses || 0}</div>
                   <div class="gf">{team.goalsFor || 0}</div>
                   <div class="ga">{team.goalsAgainst || 0}</div>
-                  <div class="gd">{(team.goalsDiff)}</div>
+                  <div class="gd">{team.goalsDiff}</div>
                   <div class="points">{team.points || 0}</div>
                 </div>
               {/each}
@@ -498,13 +494,23 @@
     text-decoration: none;
   }
 
-  .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+  .soccer-table .played,
+  .soccer-table .won,
+  .soccer-table .drawn,
+  .soccer-table .lost,
+  .soccer-table .gf,
+  .soccer-table .ga,
+  .soccer-table .gd,
+  .soccer-table .points {
     text-align: center;
     font-weight: 600;
     color: #374151;
   }
 
-  .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost {
+  .soccer-table .played,
+  .soccer-table .won,
+  .soccer-table .drawn,
+  .soccer-table .lost {
     background: #f8fafc;
     border-radius: 4px;
     padding: 3px 6px;
@@ -599,8 +605,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -674,14 +684,15 @@
     .container {
       padding: 16px;
     }
-    
+
     .league-header {
       flex-direction: column;
       gap: 16px;
       align-items: flex-start;
     }
-    
-    .soccer-table .table-header, .soccer-table .table-row {
+
+    .soccer-table .table-header,
+    .soccer-table .table-row {
       grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 30px 30px 40px;
       font-size: 12px;
       padding: 8px 12px;
@@ -722,7 +733,7 @@
       grid-template-columns: 1fr;
       gap: 20px;
     }
-    
+
     .conference-section {
       padding: 16px;
     }
@@ -733,11 +744,11 @@
       gap: 16px;
       margin-top: 12px;
     }
-    
+
     .conference-section {
       padding: 12px;
     }
-    
+
     .conference-title {
       font-size: 1.1rem;
       margin: 0 0 16px 0;
@@ -749,11 +760,11 @@
     .conference-tables {
       gap: 12px;
     }
-    
+
     .conference-section {
       padding: 8px;
     }
-    
+
     .conference-title {
       font-size: 1rem;
       margin: 0 0 12px 0;
@@ -763,62 +774,89 @@
 
   /* Mobile adjustments for soccer tables */
   @media (max-width: 1024px) {
-    .soccer-table .table-header, .soccer-table .table-row {
+    .soccer-table .table-header,
+    .soccer-table .table-row {
       grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px 50px;
       font-size: 12px;
       padding: 12px 14px;
     }
-    
+
     .soccer-table .team-logo-small {
       width: 22px;
       height: 22px;
     }
-    
-    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+
+    .soccer-table .pos,
+    .soccer-table .played,
+    .soccer-table .won,
+    .soccer-table .drawn,
+    .soccer-table .lost,
+    .soccer-table .gf,
+    .soccer-table .ga,
+    .soccer-table .gd,
+    .soccer-table .points {
       padding: 3px 6px;
       font-size: 12px;
     }
   }
 
   @media (max-width: 768px) {
-    .soccer-table .table-header, .soccer-table .table-row {
+    .soccer-table .table-header,
+    .soccer-table .table-row {
       grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 40px 40px 40px;
       font-size: 11px;
       padding: 10px 12px;
     }
-    
+
     .soccer-table .team-logo-small {
       width: 20px;
       height: 20px;
     }
-    
+
     .soccer-table .team {
       gap: 8px;
     }
-    
-    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+
+    .soccer-table .pos,
+    .soccer-table .played,
+    .soccer-table .won,
+    .soccer-table .drawn,
+    .soccer-table .lost,
+    .soccer-table .gf,
+    .soccer-table .ga,
+    .soccer-table .gd,
+    .soccer-table .points {
       padding: 2px 4px;
       font-size: 11px;
     }
   }
 
   @media (max-width: 480px) {
-    .soccer-table .table-header, .soccer-table .table-row {
+    .soccer-table .table-header,
+    .soccer-table .table-row {
       grid-template-columns: 25px 1.3fr 25px 25px 25px 25px 25px 35px 35px 35px;
       font-size: 10px;
       padding: 8px 10px;
     }
-    
+
     .soccer-table .team-logo-small {
       width: 18px;
       height: 18px;
     }
-    
+
     .soccer-table .team {
       gap: 6px;
     }
-    
-    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+
+    .soccer-table .pos,
+    .soccer-table .played,
+    .soccer-table .won,
+    .soccer-table .drawn,
+    .soccer-table .lost,
+    .soccer-table .gf,
+    .soccer-table .ga,
+    .soccer-table .gd,
+    .soccer-table .points {
       padding: 2px 3px;
       font-size: 10px;
     }

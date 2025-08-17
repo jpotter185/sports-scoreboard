@@ -27,7 +27,7 @@
   // Group teams by conference and division for better standings display
   $: afcTeams = filteredTeams.filter(team => team.conference === 'AFC');
   $: nfcTeams = filteredTeams.filter(team => team.conference === 'NFC');
-  
+
   // Sort teams within each division by win percentage
   $: sortedAFCTeams = afcTeams.sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0));
   $: sortedNFCTeams = nfcTeams.sort((a, b) => (b.winPercentage || 0) - (a.winPercentage || 0));
@@ -70,8 +70,8 @@
         <div class="league-header">
           <span class="league-emoji">🏈</span>
           <h1 class="league-title">{league.name}</h1>
-          <FavoriteButton 
-            isFavorite={league.isFavorite || false} 
+          <FavoriteButton
+            isFavorite={league.isFavorite || false}
             size="large"
             on:toggle={() => favoritesStore.toggleLeague(league.id)}
           />
@@ -90,26 +90,22 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
     <!-- Controls -->
     <div class="controls">
-      <button class="control-button" on:click={refreshData}>
-        🔄 Refresh
-      </button>
+      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
     </div>
 
     <!-- Standings Section -->
     <div class="standings-container">
       <div class="standings-section">
-        <button class="section-header" on:click={() => showStandings = !showStandings}>
+        <button class="section-header" on:click={() => (showStandings = !showStandings)}>
           <span class="section-title">Standings</span>
           <span class="expand-icon">{showStandings ? '−' : '+'}</span>
         </button>
-        
+
         {#if showStandings}
           <!-- NFL Standings Table -->
           <div class="nfl-standings">
@@ -137,10 +133,10 @@
                           <span class="team-name">{team.city} {team.name}</span>
                         </a>
                         <span class="team-division">({team.division})</span>
-                        <button 
+                        <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
-                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                          title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                           {team.isFavorite ? '★' : '☆'}
                         </button>
@@ -148,14 +144,16 @@
                       <div class="w">{team.wins || 0}</div>
                       <div class="l">{team.losses || 0}</div>
                       <div class="t">{team.ties || 0}</div>
-                      <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                      <div class="pct">
+                        {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                      </div>
                       <div class="pf">{team.pointsFor || 0}</div>
                       <div class="pa">{team.pointsAgainst || 0}</div>
                     </div>
                   {/each}
                 </div>
               </div>
-              
+
               <div class="conference-section">
                 <h3 class="conference-title">NFC Conference Standings</h3>
                 <div class="conference-table">
@@ -178,10 +176,10 @@
                           <span class="team-name">{team.city} {team.name}</span>
                         </a>
                         <span class="team-division">({team.division})</span>
-                        <button 
+                        <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
-                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                          title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                           {team.isFavorite ? '★' : '☆'}
                         </button>
@@ -189,7 +187,9 @@
                       <div class="w">{team.wins || 0}</div>
                       <div class="l">{team.losses || 0}</div>
                       <div class="t">{team.ties || 0}</div>
-                      <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                      <div class="pct">
+                        {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                      </div>
                       <div class="pf">{team.pointsFor || 0}</div>
                       <div class="pa">{team.pointsAgainst || 0}</div>
                     </div>
@@ -197,14 +197,14 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- AFC Divisions -->
             <div class="league-section">
-              <button class="league-header" on:click={() => showAFC = !showAFC}>
+              <button class="league-header" on:click={() => (showAFC = !showAFC)}>
                 <h2 class="league-title">American Football Conference</h2>
                 <span class="expand-icon">{showAFC ? '−' : '+'}</span>
               </button>
-              
+
               {#if showAFC}
                 {#each ['AFC East', 'AFC North', 'AFC South', 'AFC West'] as division}
                   <div class="division-group">
@@ -228,10 +228,10 @@
                               <img src={team.logo} alt={team.name} class="team-logo-small" />
                               <span class="team-name">{team.city} {team.name}</span>
                             </a>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
@@ -239,7 +239,9 @@
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
                           <div class="t">{team.ties || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="pf">{team.pointsFor || 0}</div>
                           <div class="pa">{team.pointsAgainst || 0}</div>
                         </div>
@@ -249,14 +251,14 @@
                 {/each}
               {/if}
             </div>
-            
+
             <!-- NFC Divisions -->
             <div class="league-section">
-              <button class="league-header" on:click={() => showNFC = !showNFC}>
+              <button class="league-header" on:click={() => (showNFC = !showNFC)}>
                 <h2 class="league-title">National Football Conference</h2>
                 <span class="expand-icon">{showNFC ? '−' : '+'}</span>
               </button>
-              
+
               {#if showNFC}
                 {#each ['NFC East', 'NFC North', 'NFC South', 'NFC West'] as division}
                   <div class="division-group">
@@ -280,10 +282,10 @@
                               <img src={team.logo} alt={team.name} class="team-logo-small" />
                               <span class="team-name">{team.city} {team.name}</span>
                             </a>
-                            <button 
+                            <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
-                              title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                              title={team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             >
                               {team.isFavorite ? '★' : '☆'}
                             </button>
@@ -291,7 +293,9 @@
                           <div class="w">{team.wins || 0}</div>
                           <div class="l">{team.losses || 0}</div>
                           <div class="t">{team.ties || 0}</div>
-                          <div class="pct">{(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}</div>
+                          <div class="pct">
+                            {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
+                          </div>
                           <div class="pf">{team.pointsFor || 0}</div>
                           <div class="pa">{team.pointsAgainst || 0}</div>
                         </div>
@@ -735,8 +739,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -815,13 +823,13 @@
       font-size: 12px;
       padding: 12px 14px;
     }
-    
+
     .nfl-standings .nfl-table .team-logo-small,
     .nfl-standings .conference-table .team-logo-small {
       width: 22px;
       height: 22px;
     }
-    
+
     .nfl-standings .nfl-table .pos,
     .nfl-standings .nfl-table .w,
     .nfl-standings .nfl-table .l,
@@ -845,13 +853,13 @@
     .container {
       padding: 16px;
     }
-    
+
     .league-header {
       flex-direction: column;
       gap: 16px;
       align-items: flex-start;
     }
-    
+
     .nfl-standings .nfl-table .table-header,
     .nfl-standings .nfl-table .table-row,
     .nfl-standings .conference-table .table-header,
@@ -860,18 +868,18 @@
       font-size: 11px;
       padding: 10px 12px;
     }
-    
+
     .nfl-standings .nfl-table .team-logo-small,
     .nfl-standings .conference-table .team-logo-small {
       width: 20px;
       height: 20px;
     }
-    
+
     .nfl-standings .nfl-table .team,
     .nfl-standings .conference-table .team {
       gap: 8px;
     }
-    
+
     .nfl-standings .nfl-table .pos,
     .nfl-standings .nfl-table .w,
     .nfl-standings .nfl-table .l,
@@ -889,11 +897,11 @@
       padding: 2px 4px;
       font-size: 11px;
     }
-    
+
     .nfl-standings .division-group {
       margin: 12px;
     }
-    
+
     .nfl-standings .division-title {
       font-size: 14px;
       padding: 10px 12px;
@@ -909,18 +917,18 @@
       font-size: 10px;
       padding: 8px 10px;
     }
-    
+
     .nfl-standings .nfl-table .team-logo-small,
     .nfl-standings .conference-table .team-logo-small {
       width: 18px;
       height: 18px;
     }
-    
+
     .nfl-standings .nfl-table .team,
     .nfl-standings .conference-table .team {
       gap: 6px;
     }
-    
+
     .nfl-standings .nfl-table .pos,
     .nfl-standings .nfl-table .w,
     .nfl-standings .nfl-table .l,

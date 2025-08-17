@@ -6,11 +6,11 @@ export const load: PageLoad = async ({ params, fetch }) => {
   try {
     const scoreboardData = await getScoreboardData(fetch);
     const league = scoreboardData.leagues.find(l => l.id === params.id);
-    
+
     if (!league) {
       return {
         league: null,
-        teams: []
+        teams: [],
       };
     }
 
@@ -22,16 +22,16 @@ export const load: PageLoad = async ({ params, fetch }) => {
     } else {
       throw new Error('Unknown soccer league');
     }
-    
+
     return {
       league,
-      teams
+      teams,
     };
   } catch (error) {
     console.error('Error loading soccer page:', error);
     return {
       league: null,
-      teams: []
+      teams: [],
     };
   }
 };

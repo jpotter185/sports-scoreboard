@@ -15,7 +15,7 @@
 
   // Get game ID from URL
   $: gameId = $page.params.id;
-  
+
   // Get back destination from query parameter, default to homepage
   $: backTo = $page.url.searchParams.get('backTo') || '/';
 
@@ -54,7 +54,7 @@
   // Get team colors with fallbacks
   $: awayTeamColor = game?.awayTeam.primaryColor || '#6B7280';
   $: homeTeamColor = game?.homeTeam.primaryColor || '#3B82F6';
-  
+
   // Function to determine if text should be white or black based on background color
   function getTextColor(backgroundColor: string): string {
     const hex = backgroundColor.replace('#', '');
@@ -64,7 +64,7 @@
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5 ? '#111827' : '#FFFFFF';
   }
-  
+
   $: awayTextColor = getTextColor(awayTeamColor);
   $: homeTextColor = getTextColor(homeTeamColor);
 
@@ -74,61 +74,90 @@
   $: isScheduled = game?.status === 'scheduled';
   $: isPostponed = game?.status === 'postponed';
   $: isCancelled = game?.status === 'cancelled';
-  
-  $: statusText = isLive ? 'LIVE' : 
-                  isFinal ? 'FINAL' : 
-                  isScheduled ? 'SCHEDULED' : 
-                  isPostponed ? 'POSTPONED' : 
-                  isCancelled ? 'CANCELLED' : 'UNKNOWN';
-                  
-  $: statusIcon = isLive ? '🔴' : 
-                  isFinal ? '✅' : 
-                  isScheduled ? '⏰' : 
-                  isPostponed ? '⏸️' : 
-                  isCancelled ? '❌' : 'ℹ️';
+
+  $: statusText = isLive
+    ? 'LIVE'
+    : isFinal
+      ? 'FINAL'
+      : isScheduled
+        ? 'SCHEDULED'
+        : isPostponed
+          ? 'POSTPONED'
+          : isCancelled
+            ? 'CANCELLED'
+            : 'UNKNOWN';
+
+  $: statusIcon = isLive
+    ? '🔴'
+    : isFinal
+      ? '✅'
+      : isScheduled
+        ? '⏰'
+        : isPostponed
+          ? '⏸️'
+          : isCancelled
+            ? '❌'
+            : 'ℹ️';
 
   // Game date and time
   $: gameDate = game?.date ? new Date(game.date) : null;
-  $: displayDate = gameDate ? gameDate.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }) : '';
-  $: displayTime = gameDate ? gameDate.toLocaleTimeString('en-US', { 
-    hour: 'numeric', 
-    minute: '2-digit', 
-    timeZoneName: 'short' 
-  }) : '';
+  $: displayDate = gameDate
+    ? gameDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : '';
+  $: displayTime = gameDate
+    ? gameDate.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      })
+    : '';
 
   // Determine winner
-  $: winningTeam = isFinal && game ? 
-    (game.awayScore > game.homeScore ? game.awayTeam : game.homeScore > game.awayScore ? game.homeTeam : null) : null;
+  $: winningTeam =
+    isFinal && game
+      ? game.awayScore > game.homeScore
+        ? game.awayTeam
+        : game.homeScore > game.awayScore
+          ? game.homeTeam
+          : null
+      : null;
   $: isTie = isFinal && game && game.awayScore === game.homeScore;
   // Get league info
-  $: leagueId = game ? (game.awayTeam.conference === 'NFC' || game.awayTeam.conference === 'AFC' ? 'nfl' : 
-                        game.awayTeam.conference === 'American League' || game.awayTeam.conference === 'National League' ? 'mlb' : 
-                        'soccer') : null;
-  $: leagueEmoji = leagueId === 'nfl' ? '🏈' : leagueId === 'mlb' ? '⚾' : '⚽';
+  $: leagueId = game
+    ? game.awayTeam.conference === 'NFC' || game.awayTeam.conference === 'AFC'
+      ? 'nfl'
+      : game.awayTeam.conference === 'American League' ||
+          game.awayTeam.conference === 'National League'
+        ? 'mlb'
+        : 'soccer'
+    : null;
 </script>
 
 <svelte:head>
-  <title>{game ? `${game.awayTeam.city} ${game.awayTeam.name} @ ${game.homeTeam.city} ${game.homeTeam.name}` : 'Game'} - Sports Scoreboard</title>
+  <title
+    >{game
+      ? `${game.awayTeam.city} ${game.awayTeam.name} @ ${game.homeTeam.city} ${game.homeTeam.name}`
+      : 'Game'} - Sports Scoreboard</title
+  >
 </svelte:head>
 
 <div class="container">
   <!-- Header -->
   <div class="header">
-    <a href={backTo} class="back-link">
-      ← Back 
-    </a>
-    
+    <a href={backTo} class="back-link"> ← Back </a>
+
     {#if game}
       <div class="game-info">
         <div class="game-header">
-          <span class="league-emoji">{leagueEmoji}</span>
           <h1 class="game-title">
-            {game.awayTeam.city} {game.awayTeam.name} @ {game.homeTeam.city} {game.homeTeam.name}
+            {game.awayTeam.city}
+            {game.awayTeam.name} @ {game.homeTeam.city}
+            {game.homeTeam.name}
           </h1>
         </div>
         <div class="game-status">
@@ -155,13 +184,125 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={findGame}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={findGame}> Try Again </button>
     </div>
   {:else if game}
     <!-- Game Details -->
     <div class="game-details">
+      <!-- Teams Section -->
+      <div class="teams-section">
+        <h3>🏈 Teams</h3>
+        <div class="teams-container">
+          <!-- Away Team -->
+          <div
+            class="team-card away-team"
+            class:winner={winningTeam === game.awayTeam}
+            class:tie={isTie}
+          >
+            <div class="team-header">
+              <a href="/team/{game.league}/{game.awayTeam.id}">
+                <div class="team-logo" style="background: {awayTeamColor}">
+                  {#if game.awayTeam.logo}
+                    <img src={game.awayTeam.logo} alt="{game.awayTeam.name} logo" loading="lazy" />
+                  {:else}
+                    <div class="team-logo-fallback" style="color: {awayTextColor}">
+                      {game.awayTeam.abbreviation}
+                    </div>
+                  {/if}
+                </div>
+              </a>
+              <div class="team-info">
+                <div class="team-city">{game.awayTeam.city}</div>
+                <div class="team-name">{game.awayTeam.name}</div>
+                {#if game.awayTeam.record}
+                  <div class="team-record">{game.awayTeam.record}</div>
+                {/if}
+                {#if game.awayTeam.conference}
+                  <div class="team-conference">{game.awayTeam.conference}</div>
+                {/if}
+              </div>
+              <FavoriteButton
+                isFavorite={game?.awayTeam?.isFavorite || false}
+                size="medium"
+                on:toggle={() => game && toggleTeamFavorite(game.awayTeam.id)}
+              />
+            </div>
+            {#if !isScheduled}
+              <div
+                class="team-score"
+                class:winning={winningTeam === game.awayTeam}
+                class:losing={winningTeam && winningTeam !== game.awayTeam}
+              >
+                {game.awayScore}
+              </div>
+            {/if}
+          </div>
+
+          <!-- VS Divider -->
+          <div class="vs-divider">
+            <div class="vs-badge">
+              <span class="vs-text">@</span>
+            </div>
+          </div>
+
+          <!-- Home Team -->
+          <div
+            class="team-card home-team"
+            class:winner={winningTeam === game.homeTeam}
+            class:tie={isTie}
+          >
+            <div class="team-header">
+              <a href="/team/{game.league}/{game.homeTeam.id}">
+                <div class="team-logo" style="background: {homeTeamColor}">
+                  {#if game.homeTeam.logo}
+                    <img src={game.homeTeam.logo} alt="{game.homeTeam.name} logo" loading="lazy" />
+                  {:else}
+                    <div class="team-logo-fallback" style="color: {homeTextColor}">
+                      {game.homeTeam.abbreviation}
+                    </div>
+                  {/if}
+                </div>
+              </a>
+              <div class="team-info">
+                <div class="team-city">{game.homeTeam.city}</div>
+                <div class="team-name">{game.homeTeam.name}</div>
+                {#if game.homeTeam.record}
+                  <div class="team-record">{game.homeTeam.record}</div>
+                {/if}
+                {#if game.homeTeam.conference}
+                  <div class="team-conference">{game.homeTeam.conference}</div>
+                {/if}
+              </div>
+              <FavoriteButton
+                isFavorite={game?.homeTeam?.isFavorite || false}
+                size="medium"
+                on:toggle={() => game && toggleTeamFavorite(game.homeTeam.id)}
+              />
+            </div>
+            {#if !isScheduled}
+              <div
+                class="team-score"
+                class:winning={winningTeam === game.homeTeam}
+                class:losing={winningTeam && winningTeam !== game.homeTeam}
+              >
+                {game.homeScore}
+              </div>
+            {/if}
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Info -->
+      {#if game.odds}
+        <div class="detail-section">
+          <h3>🎲 Odds</h3>
+          <div class="detail-content">
+            <div class="detail-item">
+              <span class="detail-value">{game.odds}</span>
+            </div>
+          </div>
+        </div>
+      {/if}
       <!-- Date and Time -->
       {#if gameDate}
         <div class="detail-section">
@@ -178,7 +319,6 @@
           </div>
         </div>
       {/if}
-
       <!-- Venue -->
       {#if game.venue}
         <div class="detail-section">
@@ -186,119 +326,6 @@
           <div class="detail-content">
             <div class="detail-item">
               <span class="detail-value">{game.venue}</span>
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      <!-- Teams Section -->
-      <div class="teams-section">
-        <h3>🏈 Teams</h3>
-        <div class="teams-container">
-          <!-- Away Team -->
-          <div class="team-card away-team" class:winner={winningTeam === game.awayTeam} class:tie={isTie}>
-            <div class="team-header">
-              <a href="/team/{game.league}/{game.awayTeam.id}">
-              <div class="team-logo" style="background: {awayTeamColor}">
-                {#if game.awayTeam.logo}
-                  <img src={game.awayTeam.logo} alt="{game.awayTeam.name} logo" loading="lazy" />
-                {:else}
-                  <div class="team-logo-fallback" style="color: {awayTextColor}">
-                    {game.awayTeam.abbreviation}
-                  </div>
-                {/if}
-              </div>
-              </a>
-              <div class="team-info">
-                <div class="team-city">{game.awayTeam.city}</div>
-                <div class="team-name">{game.awayTeam.name}</div>
-                {#if game.awayTeam.record}
-                  <div class="team-record">{game.awayTeam.record}</div>
-                {/if}
-                {#if game.awayTeam.conference}
-                  <div class="team-conference">{game.awayTeam.conference}</div>
-                {/if}
-              </div>
-              <FavoriteButton 
-                isFavorite={game?.awayTeam?.isFavorite || false} 
-                size="medium"
-                on:toggle={() => game && toggleTeamFavorite(game.awayTeam.id)}
-              />
-            </div>
-            {#if !isScheduled}
-              <div class="team-score" class:winning={winningTeam === game.awayTeam} class:losing={winningTeam && winningTeam !== game.awayTeam}>
-                {game.awayScore}
-              </div>
-            {/if}
-          </div>
-
-          <!-- VS Divider -->
-          <div class="vs-divider">
-            <div class="vs-badge">
-              <span class="vs-text">@</span>
-            </div>
-          </div>
-
-          <!-- Home Team -->
-          <div class="team-card home-team" class:winner={winningTeam === game.homeTeam} class:tie={isTie}>
-            <div class="team-header">
-              <a href="/team/{game.league}/{game.homeTeam.id}">
-              <div class="team-logo" style="background: {homeTeamColor}">
-                {#if game.homeTeam.logo}
-                  <img src={game.homeTeam.logo} alt="{game.homeTeam.name} logo" loading="lazy" />
-                {:else}
-                  <div class="team-logo-fallback" style="color: {homeTextColor}">
-                    {game.homeTeam.abbreviation}
-                  </div>
-                {/if}
-              </div>
-              </a>
-              <div class="team-info">
-                <div class="team-city">{game.homeTeam.city}</div>
-                <div class="team-name">{game.homeTeam.name}</div>
-                {#if game.homeTeam.record}
-                  <div class="team-record">{game.homeTeam.record}</div>
-                {/if}
-                {#if game.homeTeam.conference}
-                  <div class="team-conference">{game.homeTeam.conference}</div>
-                {/if}
-              </div>
-              <FavoriteButton 
-                isFavorite={game?.homeTeam?.isFavorite || false} 
-                size="medium"
-                on:toggle={() => game && toggleTeamFavorite(game.homeTeam.id)}
-              />
-            </div>
-            {#if !isScheduled}
-              <div class="team-score" class:winning={winningTeam === game.homeTeam} class:losing={winningTeam && winningTeam !== game.homeTeam}>
-                {game.homeScore}
-              </div>
-            {/if}
-          </div>
-        </div>
-
-        <!-- Game Result -->
-        {#if isFinal}
-          <div class="game-result">
-            {#if isTie}
-              <div class="result-tie">Game ended in a tie</div>
-            {:else if winningTeam}
-              <div class="result-winner">
-                <span class="winner-label">Winner:</span>
-                <span class="winner-team">{winningTeam.city} {winningTeam.name}</span>
-              </div>
-            {/if}
-          </div>
-        {/if}
-      </div>
-
-      <!-- Additional Info -->
-      {#if game.odds}
-        <div class="detail-section">
-          <h3>🎲 Odds</h3>
-          <div class="detail-content">
-            <div class="detail-item">
-              <span class="detail-value">{game.odds}</span>
             </div>
           </div>
         </div>
@@ -672,8 +699,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -745,11 +776,25 @@
 
   /* Mobile adjustments */
   @media (max-width: 480px) {
-    .container { padding: 12px; }
-    .game-title { font-size: 1.5rem; }
-    .league-emoji { font-size: 2.5rem; }
-    .team-header { flex-direction: column; text-align: center; }
-    .team-logo { width: 48px; height: 48px; }
-    .team-score { font-size: 36px; }
+    .container {
+      padding: 12px;
+    }
+    .game-title {
+      font-size: 1.5rem;
+    }
+    .league-emoji {
+      font-size: 2.5rem;
+    }
+    .team-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    .team-logo {
+      width: 48px;
+      height: 48px;
+    }
+    .team-score {
+      font-size: 36px;
+    }
   }
 </style>

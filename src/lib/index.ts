@@ -5,13 +5,13 @@ export type { Team, Game, League, ScoreboardData } from './types';
 export { getScoreboardData, scoreboardData } from './data';
 
 // Export API functions
-export { 
-  fetchNFLTeams, 
-  fetchMLSTeams, 
-  fetchNFLGames, 
+export {
+  fetchNFLTeams,
+  fetchMLSTeams,
+  fetchNFLGames,
   fetchMLSGames,
   fetchMLBTeams,
-  fetchMLBGames
+  fetchMLBGames,
 } from './api';
 
 // Export components

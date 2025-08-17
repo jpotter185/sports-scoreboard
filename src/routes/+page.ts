@@ -5,12 +5,12 @@ export const load: PageLoad = async ({ fetch }) => {
   try {
     const scoreboardData = await getScoreboardData(fetch);
     return {
-      scoreboardData
+      scoreboardData,
     };
   } catch (error) {
     console.error('Error in page load:', error);
     return {
-      scoreboardData: { leagues: [], lastUpdated: new Date().toLocaleTimeString() }
+      scoreboardData: { leagues: [], lastUpdated: new Date().toLocaleTimeString() },
     };
   }
 };

@@ -4,7 +4,7 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ params, fetch }) => {
   try {
     const scoreboardData = await getScoreboardData(fetch);
-    
+
     // Find game by ID across all leagues
     let game = null;
     for (const league of scoreboardData.leagues) {
@@ -14,14 +14,14 @@ export const load: PageLoad = async ({ params, fetch }) => {
         break;
       }
     }
-    
+
     return {
-      game
+      game,
     };
   } catch (error) {
     console.error('Error loading game data:', error);
     return {
-      game: null
+      game: null,
     };
   }
 };

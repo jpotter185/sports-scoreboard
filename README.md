@@ -3,6 +3,7 @@
 A clean, fast scoreboard you can open on any device to see what matters now: live professional sports scores and game status for the NFL, MLS, MLB, and EPL.
 
 ### What it does
+
 - Shows today’s games by league, with clear, compact tiles that are easy to read on phone or desktop
 - Highlights what’s live right now and refreshes automatically every 30 seconds
 - Lets you collapse leagues, jump directly to a league, and reorder leagues to match your preferences
@@ -10,11 +11,13 @@ A clean, fast scoreboard you can open on any device to see what matters now: liv
 - Links each game tile to its official ESPN game page for deeper details
 
 ### Who it’s for
+
 - Fans who want a single place to check live scores across multiple leagues
 - People who follow multiple sports and want quick navigation and personalization
 - Anyone who wants a fast, mobile-friendly scoreboard they can share or deploy quickly
 
 ### Why teams love it
+
 - Clear status at a glance: Scheduled, Live, Final
 - League-level rollups where it matters (e.g., live counts, final counts); no clutter at the top
 - Consistent, readable formatting for dates and live periods (quarters, halves, innings with outs)
@@ -63,6 +66,7 @@ A clean, fast scoreboard you can open on any device to see what matters now: liv
 ---
 
 ## Roadmap (optional future)
+
 - Favorite teams view
 - Alerts for close games or final results
 - Theme options (dark mode, compact mode)

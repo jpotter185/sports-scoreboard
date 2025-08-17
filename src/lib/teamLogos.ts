@@ -69,17 +69,17 @@ export const mlbLogos: Record<string, string> = {
 };
 
 export const eplLogos: Record<string, string> = {
-  'arsenal': 'https://a.espncdn.com/i/teamlogos/soccer/500/359.png',
+  arsenal: 'https://a.espncdn.com/i/teamlogos/soccer/500/359.png',
   'aston villa': 'https://a.espncdn.com/i/teamlogos/soccer/500/367.png',
-  'bournemouth': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'brentford': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'brighton': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'burnley': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'chelsea': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  bournemouth: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  brentford: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  brighton: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  burnley: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  chelsea: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'crystal palace': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'everton': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'fulham': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'liverpool': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  everton: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  fulham: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  liverpool: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'luton town': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'manchester city': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'manchester united': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
@@ -88,7 +88,7 @@ export const eplLogos: Record<string, string> = {
   'sheffield united': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'tottenham hotspur': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
   'west ham united': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
-  'wolverhampton': 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
+  wolverhampton: 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png',
 };
 
 export const mlsLogos: Record<string, string> = {
@@ -129,7 +129,7 @@ export function getTeamLogoByLeague(league: string, teamId: string, espnLogo?: s
   if (espnLogo && espnLogo !== 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png') {
     return espnLogo;
   }
-  
+
   // Second priority: Try to get logo by team name
   const teamName = getTeamNameFromId(teamId, league);
   if (teamName) {
@@ -138,7 +138,7 @@ export function getTeamLogoByLeague(league: string, teamId: string, espnLogo?: s
       return logo;
     }
   }
-  
+
   // Final fallback to a generic logo
   return 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png';
 }
@@ -153,7 +153,7 @@ function getTeamNameFromId(teamId: string, league: string): string | null {
 // Helper function to get logo by team name and league
 function getLogoByName(teamName: string, league: string): string | null {
   const normalizedName = teamName.toLowerCase();
-  
+
   switch (league.toLowerCase()) {
     case 'nfl':
       return nflLogos[normalizedName] || null;
@@ -171,13 +171,13 @@ function getLogoByName(teamName: string, league: string): string | null {
 // Function to get logo by team name and city (for when we don't have the league context)
 export function getTeamLogoByName(teamName: string, city: string): string {
   const fullName = `${city} ${teamName}`.toLowerCase();
-  
+
   // Try all leagues
   if (nflLogos[fullName]) return nflLogos[fullName];
   if (mlbLogos[fullName]) return mlbLogos[fullName];
   if (eplLogos[fullName]) return eplLogos[fullName];
   if (mlsLogos[fullName]) return mlsLogos[fullName];
-  
+
   // Return generic logo if no match found
   return 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png';
 }
@@ -189,10 +189,10 @@ export function getTeamLogo(teamId: string, espnLogo?: string): string {
   if (mlbLogos[teamId]) return mlbLogos[teamId];
   if (eplLogos[teamId]) return eplLogos[teamId];
   if (mlsLogos[teamId]) return mlsLogos[teamId];
-  
+
   // Fallback to ESPN logo if available
   if (espnLogo) return espnLogo;
-  
+
   // Final fallback to generic logo
   return 'https://a.espncdn.com/i/teamlogos/soccer/500/349.png';
 }

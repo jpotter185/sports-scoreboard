@@ -41,7 +41,9 @@
 
   // persist showFavoritesOnly
   $: if (browser) {
-    try { localStorage.setItem('showFavoritesOnly', showFavoritesOnly ? '1' : '0'); } catch {}
+    try {
+      localStorage.setItem('showFavoritesOnly', showFavoritesOnly ? '1' : '0');
+    } catch {}
   }
 
   async function refreshData() {
@@ -69,22 +71,27 @@
   }
 
   // Filter teams and games based on favorites preference
-  $: filteredTeams = showFavoritesOnly && league 
-    ? league.teams.filter(team => {
-        if (!league) return false;
-        const internalId = `${league.id}-${team.id}`;
-        return $favoritesStore.teams.includes(internalId);
-      })
-    : league?.teams || [];
+  $: filteredTeams =
+    showFavoritesOnly && league
+      ? league.teams.filter(team => {
+          if (!league) return false;
+          const internalId = `${league.id}-${team.id}`;
+          return $favoritesStore.teams.includes(internalId);
+        })
+      : league?.teams || [];
 
-  $: filteredGames = showFavoritesOnly && league
-    ? league.games.filter(game => {
-        if (!league) return false;
-        const homeTeamInternalId = `${league.id}-${game.homeTeam.id}`;
-        const awayTeamInternalId = `${league.id}-${game.awayTeam.id}`;
-        return $favoritesStore.teams.includes(homeTeamInternalId) || $favoritesStore.teams.includes(awayTeamInternalId);
-      })
-    : league?.games || [];
+  $: filteredGames =
+    showFavoritesOnly && league
+      ? league.games.filter(game => {
+          if (!league) return false;
+          const homeTeamInternalId = `${league.id}-${game.homeTeam.id}`;
+          const awayTeamInternalId = `${league.id}-${game.awayTeam.id}`;
+          return (
+            $favoritesStore.teams.includes(homeTeamInternalId) ||
+            $favoritesStore.teams.includes(awayTeamInternalId)
+          );
+        })
+      : league?.games || [];
 
   // Sort games by date (oldest first)
   $: sortedGames = [...filteredGames].sort((a, b) => {
@@ -93,8 +100,7 @@
   });
 
   // Get league emoji
-  $: leagueEmoji = league?.id === 'nfl' ? '🏈' : 
-                   league?.id === 'mlb' ? '⚾' : '⚽';
+  $: leagueEmoji = league?.id === 'nfl' ? '🏈' : league?.id === 'mlb' ? '⚾' : '⚽';
 </script>
 
 <svelte:head>
@@ -105,14 +111,14 @@
   <!-- Header -->
   <div class="header">
     <a href="/" class="back-link">← Back </a>
-    
+
     {#if league}
       <div class="league-info">
         <div class="league-header">
           <span class="league-emoji">{leagueEmoji}</span>
           <h1 class="league-title">{league.name}</h1>
-          <FavoriteButton 
-            isFavorite={league.isFavorite || false} 
+          <FavoriteButton
+            isFavorite={league.isFavorite || false}
             size="large"
             on:toggle={toggleLeagueFavorite}
           />
@@ -131,17 +137,17 @@
   {:else if error}
     <div class="error-message">
       <div class="error-title">⚠️ {error}</div>
-      <button class="retry-button" on:click={refreshData}>
-        Try Again
-      </button>
+      <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
     <!-- Controls -->
     <div class="controls">
-      <button class="control-button" on:click={refreshData}>
-        🔄 Refresh
-      </button>
-      <button class="control-button" on:click={() => showFavoritesOnly = !showFavoritesOnly} class:active={showFavoritesOnly}>
+      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
+      <button
+        class="control-button"
+        on:click={() => (showFavoritesOnly = !showFavoritesOnly)}
+        class:active={showFavoritesOnly}
+      >
         {showFavoritesOnly ? '⭐ Show All' : '⭐ Show Favorites Only'}
       </button>
     </div>
@@ -186,7 +192,9 @@
           <div class="no-games-icon">🏟️</div>
           <div class="no-games-title">No games available</div>
           <div class="no-games-subtitle">
-            {showFavoritesOnly ? 'No favorite teams have games scheduled' : 'Check back later for upcoming games'}
+            {showFavoritesOnly
+              ? 'No favorite teams have games scheduled'
+              : 'Check back later for upcoming games'}
           </div>
         </div>
       {/if}
@@ -367,8 +375,12 @@
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .error-message {
@@ -468,18 +480,18 @@
     .container {
       padding: 16px;
     }
-    
+
     .league-header {
       flex-direction: column;
       gap: 16px;
       align-items: flex-start;
     }
-    
+
     .sport-navigation {
       flex-direction: column;
       align-items: center;
     }
-    
+
     .sport-link {
       min-width: 100%;
       justify-content: center;

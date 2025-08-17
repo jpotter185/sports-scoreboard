@@ -1,3 +1,15 @@
+<script context="module">
+  // Function to determine if text should be white or black based on background color
+  function getTextColor(backgroundColor: string): string {
+    const hex = backgroundColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.5 ? '#111827' : '#FFFFFF';
+  }
+</script>
+
 <script lang="ts">
   import type { Team } from '$lib/types';
   import FavoriteButton from './FavoriteButton.svelte';
@@ -18,14 +30,21 @@
 <div class="team-card {compact ? 'compact' : ''}">
   <div class="team-logo" style="background: {team.primaryColor || '#6B7280'}">
     {#if team.logo}
-      <img src={team.logo} alt="{team.name} logo" loading="lazy" decoding="async" width="40" height="40" />
+      <img
+        src={team.logo}
+        alt="{team.name} logo"
+        loading="lazy"
+        decoding="async"
+        width="40"
+        height="40"
+      />
     {:else}
       <div class="team-logo-fallback" style="color: {getTextColor(team.primaryColor || '#6B7280')}">
         {team.abbreviation}
       </div>
     {/if}
   </div>
-  
+
   <div class="team-info">
     <div class="team-city">{team.city}</div>
     <div class="team-name">{team.name}</div>
@@ -33,27 +52,11 @@
       <div class="team-record">{team.record}</div>
     {/if}
   </div>
-  
+
   <div class="team-actions">
-    <FavoriteButton 
-      isFavorite={teamIsFavorite} 
-      size="small"
-      on:toggle={toggleTeamFavorite}
-    />
+    <FavoriteButton isFavorite={teamIsFavorite} size="small" on:toggle={toggleTeamFavorite} />
   </div>
 </div>
-
-<script context="module">
-  // Function to determine if text should be white or black based on background color
-  function getTextColor(backgroundColor: string): string {
-    const hex = backgroundColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.5 ? '#111827' : '#FFFFFF';
-  }
-</script>
 
 <style>
   .team-card {
