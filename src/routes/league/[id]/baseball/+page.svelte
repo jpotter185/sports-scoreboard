@@ -91,18 +91,18 @@
       <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
-    <!-- Controls -->
-    <div class="controls">
-      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
-    </div>
-
     <!-- Standings Section -->
     <div class="standings-container">
       <div class="standings-section">
-        <button class="section-header" on:click={() => (showStandings = !showStandings)}>
-          <span class="section-title">Standings</span>
-          <span class="expand-icon">{showStandings ? '−' : '+'}</span>
-        </button>
+        <div class="section-header">
+          <div class="header-left">
+            <span class="section-title">Standings</span>
+            <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
+          </div>
+          <button class="expand-toggle" on:click={() => (showStandings = !showStandings)}>
+            <span class="expand-icon">{showStandings ? '−' : '+'}</span>
+          </button>
+        </div>
 
         {#if showStandings}
           <!-- MLB Standings Table -->
@@ -130,8 +130,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'AL East')
@@ -139,8 +138,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -154,8 +157,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -177,8 +179,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'AL Central')
@@ -186,8 +187,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -201,8 +206,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -224,8 +228,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'AL West')
@@ -233,8 +236,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -248,8 +255,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -281,8 +287,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'NL East')
@@ -290,8 +295,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -305,8 +314,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -328,8 +336,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'NL Central')
@@ -337,8 +344,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -352,8 +363,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -375,8 +385,7 @@
                         <div class="w">W</div>
                         <div class="l">L</div>
                         <div class="pct">PCT</div>
-                        <div class="div-gb">Div GB</div>
-                        <div class="standing">Standing</div>
+                        <div class="gb">GB</div>
                       </div>
                       {#each filteredTeams
                         .filter(team => team.division === 'NL West')
@@ -384,8 +393,12 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a
+                              href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball"
+                            >
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -399,8 +412,7 @@
                           <div class="pct">
                             {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                           </div>
-                          <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                          <div class="standing">{team.standingSummary || ''}</div>
+                          <div class="gb">{team.gamesBack || 0}</div>
                         </div>
                       {/each}
                     </div>
@@ -420,15 +432,16 @@
                     <div class="w">W</div>
                     <div class="l">L</div>
                     <div class="pct">PCT</div>
-                    <div class="div-gb">Div GB</div>
-                    <div class="standing">Standing</div>
+                    <div class="gb">GB</div>
                   </div>
                   {#each filteredTeams.filter(team => !team.division) as team, index (team.id)}
                     <div class="table-row">
                       <div class="pos">{index + 1}</div>
                       <div class="team">
-                        <img src={team.logo} alt={team.name} class="team-logo-small" />
-                        <span class="team-name">{team.city} {team.name}</span>
+                        <a href="/team/{league.id}/{team.id}?backTo=/league/{league.id}/baseball">
+                          <img src={team.logo} alt={team.name} class="team-logo-small" />
+                          <span class="team-name">{team.city} {team.name}</span>
+                        </a>
                         <button
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                           on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -442,8 +455,7 @@
                       <div class="pct">
                         {(team.winPercentage || 0).toFixed(3).replace(/^0+/, '')}
                       </div>
-                      <div class="div-gb">{team.divisionGamesBehind || 0}</div>
-                      <div class="standing">{team.standingSummary || ''}</div>
+                      <div class="gb">{team.gamesBack || 0}</div>
                     </div>
                   {/each}
                 </div>
@@ -534,28 +546,6 @@
     margin: 0;
   }
 
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-
-  .control-button {
-    padding: 8px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: white;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .control-button:hover {
-    background: #e2e8f0;
-  }
-
   .standings-container {
     margin-bottom: 32px;
   }
@@ -568,31 +558,75 @@
     border: 1px solid #e5e7eb;
   }
 
-  .section-header {
+  .standings-section .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    cursor: default;
+  }
+
+  .standings-section .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .standings-section .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .standings-section .expand-toggle {
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
+    color: #64748b;
     border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #334155;
+    padding: 8px 12px;
     cursor: pointer;
-    text-align: left;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .section-header:hover {
+  .standings-section .expand-toggle:hover {
     background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #475569;
   }
 
-  .expand-icon {
+  .standings-section .expand-icon {
     font-size: 1.2rem;
-    color: #6b7280;
+    font-weight: 700;
     transition: transform 0.2s ease;
+  }
+
+  .control-button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .control-button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   }
 
   /* MLB Standings Styles */
@@ -708,50 +742,37 @@
   .mlb-standings .mlb-table {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
+    gap: 4px;
   }
 
   .mlb-standings .table-header {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 60px 80px;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    font-weight: 700;
+    grid-template-columns: 40px 1fr 50px 50px 60px 50px;
+    background: #f8fafc;
+    font-weight: 600;
     color: #374151;
     font-size: 13px;
-    padding: 16px;
-    border-bottom: 2px solid #e5e7eb;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
   }
 
   .mlb-standings .table-row {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 60px 80px;
-    padding: 14px 16px;
-    border-bottom: 1px solid #f3f4f6;
+    grid-template-columns: 40px 1fr 50px 50px 60px 50px;
+    padding: 12px 16px;
+    border-radius: 8px;
     align-items: center;
     font-size: 14px;
     transition: all 0.2s ease;
+    border: 1px solid #f1f5f9;
   }
 
   .mlb-standings .table-row:hover {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    transform: translateX(2px);
-  }
-
-  .mlb-standings .table-row:nth-child(even) {
-    background: #fafbfc;
-  }
-
-  .mlb-standings .table-row:nth-child(even):hover {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  }
-
-  .mlb-standings .table-row:last-child {
-    border-bottom: none;
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .mlb-standings .pos {
@@ -765,70 +786,45 @@
   }
 
   .mlb-standings .team {
-    font-weight: 500;
-    color: #111827;
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
+  .mlb-standings .team a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1;
+  }
+
+  .mlb-standings .team a:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+
   .mlb-standings .team-logo-small {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #e5e7eb;
+    border: 1px solid #e5e7eb;
   }
 
   .mlb-standings .team-name {
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
     font-weight: 600;
+    color: #111827;
   }
 
   .mlb-standings .w,
   .mlb-standings .l,
   .mlb-standings .pct,
-  .mlb-standings .div-gb,
-  .mlb-standings .standing {
+  .mlb-standings .gb {
     text-align: center;
     font-weight: 600;
     color: #374151;
-  }
-
-  .mlb-standings .w,
-  .mlb-standings .l {
-    background: #f8fafc;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-  }
-
-  .mlb-standings .pct {
-    background: #f0f9ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: #0369a1;
-  }
-
-  .mlb-standings .div-gb {
-    background: #fef3c7;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: #92400e;
-  }
-
-  .mlb-standings .standing {
-    background: #f3e8ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 12px;
-    color: #7c3aed;
-    font-weight: 500;
   }
 
   .mlb-standings .favorite-btn {
@@ -963,35 +959,254 @@
   /* Mobile adjustments */
   @media (max-width: 768px) {
     .container {
-      padding: 16px;
+      padding: 12px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      font-size: 16px;
+      padding: 8px 0;
+      margin-bottom: 12px;
     }
 
     .league-header {
       flex-direction: column;
       gap: 12px;
       align-items: flex-start;
-      padding: 10px 12px;
+      padding: 16px;
+    }
+
+    .league-title {
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .league-subtitle {
+      font-size: 16px;
+    }
+
+    .standings-section {
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .standings-section .section-header {
+      padding: 16px;
+      margin-bottom: 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .standings-section .header-left {
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .standings-section .section-title {
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .control-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      min-height: 48px;
+    }
+
+    .standings-section .expand-toggle {
+      padding: 12px 20px;
+      min-height: 48px;
+      font-size: 16px;
+    }
+
+    .division-group {
+      margin-bottom: 24px;
+    }
+
+    .division-header {
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .division-title {
+      font-size: 18px;
+      padding: 16px;
+    }
+
+    /* Table mobile optimizations */
+    .mlb-standings .mlb-table {
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
     .mlb-standings .table-header,
     .mlb-standings .table-row {
-      grid-template-columns: 30px 1.5fr 30px 30px 40px 30px 40px 50px 60px;
-      font-size: 12px;
+      grid-template-columns: 40px 1fr 50px 50px 60px 50px;
+      padding: 16px 12px;
+      gap: 8px;
+      font-size: 14px;
+      min-height: 60px;
+    }
+
+    .mlb-standings .pos {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mlb-standings .team {
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .mlb-standings .team a {
+      gap: 12px;
+      padding: 8px;
+      min-height: 44px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .mlb-standings .team a:hover {
+      background-color: #f8fafc;
+    }
+
+    .mlb-standings .team a:active {
+      background-color: #e2e8f0;
+    }
+
+    .mlb-standings .team-logo-small {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+    }
+
+    .mlb-standings .team-name {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .mlb-standings .w,
+    .mlb-standings .l,
+    .mlb-standings .pct,
+    .mlb-standings .gb {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .mlb-standings .favorite-btn {
       padding: 8px 12px;
-    }
-
-    .mlb-standings .league-title {
+      min-width: 44px;
+      min-height: 44px;
       font-size: 18px;
+      border-radius: 8px;
     }
 
-    .mlb-standings .division-title {
+    /* Ensure tables don't overflow */
+    .mlb-standings {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+    }
+
+    .mlb-standings .mlb-table {
+      min-width: 100%;
+      width: max-content;
+    }
+  }
+
+  /* Small mobile devices */
+  @media (max-width: 480px) {
+    .container {
+      padding: 8px;
+    }
+
+    .standings-section {
+      padding: 12px;
+    }
+
+    .standings-section .section-header {
+      padding: 12px;
+    }
+
+    .division-title {
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    .mlb-standings .table-header,
+    .mlb-standings .table-row {
+      grid-template-columns: 35px 1fr 45px 45px 55px 45px;
+      padding: 12px 8px;
+      font-size: 13px;
+      min-height: 56px;
+    }
+
+    .mlb-standings .team-logo-small {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+    }
+
+    .mlb-standings .team-name {
       font-size: 14px;
     }
 
-    .section-header,
-    .division-header {
-      padding: 8px 12px;
-      font-size: 1rem;
+    .mlb-standings .w,
+    .mlb-standings .l,
+    .mlb-standings .pct,
+    .mlb-standings .gb {
+      font-size: 14px;
+      min-height: 40px;
+    }
+
+    .mlb-standings .favorite-btn {
+      min-width: 40px;
+      min-height: 40px;
+      font-size: 16px;
+    }
+
+    .control-button,
+    .standings-section .expand-toggle {
+      padding: 10px 16px;
+      min-height: 44px;
+      font-size: 15px;
+    }
+  }
+
+  /* Landscape mobile optimization */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .mlb-standings .table-header,
+    .mlb-standings .table-row {
+      grid-template-columns: 35px 1fr 45px 45px 55px 45px;
+      padding: 12px 8px;
+      min-height: 48px;
+    }
+
+    .mlb-standings .team-logo-small {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
+    }
+
+    .mlb-standings .team-name {
+      font-size: 14px;
     }
   }
 </style>

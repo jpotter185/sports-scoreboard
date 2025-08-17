@@ -12,6 +12,7 @@
     favoriteLeagues,
     applyFavoriteStatus,
   } from '$lib/favorites';
+  import { getGamesData } from '$lib/data';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -55,10 +56,15 @@
       favoritesStore.migrateFavorites(scoreboardData.leagues);
     }
 
-    const interval = setInterval(() => {
-      // For now, we'll just refresh the page to get new data
-      // In the future, we could implement client-side refresh
-      window.location.reload();
+    const interval = setInterval(async () => {
+      // Use getGamesData for frequent updates (teams are cached)
+      try {
+        const updatedData = await getGamesData();
+        scoreboardData.leagues = updatedData.leagues;
+        scoreboardData.lastUpdated = updatedData.lastUpdated;
+      } catch (error) {
+        console.error('Error refreshing games data:', error);
+      }
     }, 30000);
 
     // restore liveOnly preference
@@ -216,9 +222,19 @@
   }
 
   async function refreshData() {
-    // For now, we'll just refresh the page to get new data
-    // In the future, we could implement client-side refresh
-    window.location.reload();
+    loading = true;
+    try {
+      // Use getGamesData for manual refresh (teams are cached)
+      const updatedData = await getGamesData();
+      scoreboardData.leagues = updatedData.leagues;
+      scoreboardData.lastUpdated = updatedData.lastUpdated;
+      error = null;
+    } catch (err) {
+      error = 'Failed to refresh data';
+      console.error('Error refreshing data:', err);
+    } finally {
+      loading = false;
+    }
   }
 
   $: totalGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.length, 0);
@@ -425,7 +441,9 @@
 
   <!-- Footer -->
   <div class="footer">
-    <p>Powered by Public ESPN APIs • Auto-refreshes every 30 seconds</p>
+    <p>
+      Powered by Public ESPN APIs • Games refresh every 30 seconds • Teams update every 5 minutes
+    </p>
   </div>
 </div>
 
@@ -600,30 +618,198 @@
   }
 
   /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .container {
+      padding: 16px;
+    }
+
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .refresh-button {
+      padding: 12px 20px;
+      font-size: 0.9rem;
+      min-height: 48px;
+    }
+
+    .reorder-toggle {
+      padding: 10px 16px;
+      min-height: 44px;
+      font-size: 0.85rem;
+    }
+
+    .stats-bar {
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Favorite teams mobile optimization */
+    .favorite-teams-section {
+      margin-top: 16px;
+    }
+
+    .favorite-teams-header {
+      padding: 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .section-title {
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .collapse-button {
+      padding: 12px 20px;
+      min-height: 44px;
+      font-size: 0.9rem;
+      justify-content: center;
+    }
+
+    .favorite-teams-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .favorite-team-card {
+      padding: 16px;
+      min-height: 60px;
+    }
+
+    .favorite-team-card .team-logo {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    .favorite-team-card .team-name {
+      font-size: 16px;
+    }
+
+    .favorite-team-card .team-league {
+      font-size: 14px;
+    }
+
+    .favorite-team-card .team-record {
+      font-size: 12px;
+    }
+
+    /* League navigation mobile */
+    .leagues-nav {
+      gap: 6px;
+      margin: 12px 0 20px 0;
+    }
+
+    .nav-chip {
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      min-height: 44px;
+    }
+  }
+
   @media (max-width: 480px) {
     .container {
       padding: 12px;
     }
+
     .header {
       margin-bottom: 12px;
     }
+
     .title {
       font-size: 1.25rem;
     }
+
     .subtitle {
       font-size: 0.8rem;
       margin-bottom: 10px;
     }
+
     .refresh-button {
-      padding: 6px 12px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      min-height: 44px;
+    }
+
+    .reorder-toggle {
+      padding: 8px 12px;
+      min-height: 40px;
       font-size: 0.8rem;
     }
+
     .stats-bar {
-      border-radius: 12px;
       padding: 16px;
       margin-bottom: 16px;
     }
-    /* removed old stats grid styles */
+
+    /* Favorite teams small mobile */
+    .favorite-teams-header {
+      padding: 12px;
+    }
+
+    .section-title {
+      font-size: 15px;
+    }
+
+    .collapse-button {
+      padding: 10px 16px;
+      min-height: 40px;
+      font-size: 0.85rem;
+    }
+
+    .favorite-teams-grid {
+      padding: 12px;
+      gap: 10px;
+    }
+
+    .favorite-team-card {
+      padding: 12px;
+      min-height: 56px;
+    }
+
+    .favorite-team-card .team-logo {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .favorite-team-card .team-name {
+      font-size: 15px;
+    }
+
+    .favorite-team-card .team-league {
+      font-size: 13px;
+    }
+
+    .favorite-team-card .team-record {
+      font-size: 11px;
+    }
+
+    /* League navigation small mobile */
+    .leagues-nav {
+      gap: 4px;
+      margin: 10px 0 16px 0;
+    }
+
+    .nav-chip {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      min-height: 40px;
+    }
   }
 
   /* League jump nav */

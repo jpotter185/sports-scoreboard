@@ -90,18 +90,18 @@
       <button class="retry-button" on:click={refreshData}> Try Again </button>
     </div>
   {:else if league}
-    <!-- Controls -->
-    <div class="controls">
-      <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
-    </div>
-
     <!-- Standings Section -->
     <div class="standings-container">
       <div class="standings-section">
-        <button class="section-header" on:click={() => (showStandings = !showStandings)}>
-          <span class="section-title">Table</span>
-          <span class="expand-icon">{showStandings ? '−' : '+'}</span>
-        </button>
+        <div class="section-header">
+          <div class="header-left">
+            <span class="section-title">Table</span>
+            <button class="control-button" on:click={refreshData}> 🔄 Refresh </button>
+          </div>
+          <button class="expand-toggle" on:click={() => (showStandings = !showStandings)}>
+            <span class="expand-icon">{showStandings ? '−' : '+'}</span>
+          </button>
+        </div>
 
         {#if showStandings}
           {#if league?.id === 'mls' && data.teams.some(team => team.conference)}
@@ -308,28 +308,6 @@
     font-size: 1.1rem;
     color: #6b7280;
     margin: 0;
-  }
-
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-
-  .control-button {
-    padding: 8px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: white;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .control-button:hover {
-    background: #e2e8f0;
   }
 
   .standings-container {
@@ -682,111 +660,213 @@
   /* Mobile adjustments */
   @media (max-width: 768px) {
     .container {
-      padding: 16px;
+      padding: 12px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .back-link {
+      font-size: 16px;
+      padding: 8px 0;
+      margin-bottom: 12px;
     }
 
     .league-header {
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       align-items: flex-start;
+      padding: 16px;
+    }
+
+    .league-title {
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .league-subtitle {
+      font-size: 16px;
+    }
+
+    .standings-section {
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .standings-section .section-header {
+      padding: 16px;
+      margin-bottom: 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .standings-section .header-left {
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .standings-section .section-title {
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .control-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      min-height: 48px;
+    }
+
+    .standings-section .expand-toggle {
+      padding: 12px 20px;
+      min-height: 48px;
+      font-size: 16px;
+    }
+
+    .conference-section {
+      margin-bottom: 24px;
+    }
+
+    .conference-title {
+      font-size: 18px;
+      padding: 16px;
+    }
+
+    /* Table mobile optimizations */
+    .soccer-table {
+      gap: 8px;
+      margin-bottom: 20px;
     }
 
     .soccer-table .table-header,
     .soccer-table .table-row {
-      grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 30px 30px 40px;
-      font-size: 12px;
+      grid-template-columns: 40px 1fr 50px 50px 50px 50px 50px 50px 50px 50px;
+      padding: 16px 12px;
+      gap: 8px;
+      font-size: 14px;
+      min-height: 60px;
+    }
+
+    .soccer-table .pos {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .soccer-table .team {
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .soccer-table .team a {
+      gap: 12px;
+      padding: 8px;
+      min-height: 44px;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .soccer-table .team a:hover {
+      background-color: #f8fafc;
+    }
+
+    .soccer-table .team a:active {
+      background-color: #e2e8f0;
+    }
+
+    .soccer-table .team-logo-small {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+    }
+
+    .soccer-table .team-name {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .soccer-table .played,
+    .soccer-table .won,
+    .soccer-table .drawn,
+    .soccer-table .lost,
+    .soccer-table .gf,
+    .soccer-table .ga,
+    .soccer-table .gd,
+    .soccer-table .points {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .soccer-table .favorite-btn {
       padding: 8px 12px;
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 18px;
+      border-radius: 8px;
     }
-  }
 
-  /* Conference Tables Styles */
-  .conference-tables {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 12px;
-  }
-
-  .conference-section {
-    background: white;
-    border-radius: 8px;
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
-
-  .conference-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #111827;
-    margin: 0 0 16px 0;
-    text-align: center;
-    padding: 10px;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    border-radius: 6px;
-    border: 1px solid #e5e7eb;
-  }
-
-  /* Mobile adjustments for conference tables */
-  @media (max-width: 1024px) {
+    /* Ensure tables don't overflow */
     .conference-tables {
-      grid-template-columns: 1fr;
-      gap: 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
     }
 
-    .conference-section {
-      padding: 16px;
+    .soccer-table {
+      min-width: 100%;
+      width: max-content;
     }
   }
 
-  @media (max-width: 768px) {
-    .conference-tables {
-      gap: 16px;
-      margin-top: 12px;
+  /* Small mobile devices */
+  @media (max-width: 480px) {
+    .container {
+      padding: 8px;
     }
 
-    .conference-section {
+    .standings-section {
+      padding: 12px;
+    }
+
+    .standings-section .section-header {
       padding: 12px;
     }
 
     .conference-title {
-      font-size: 1.1rem;
-      margin: 0 0 16px 0;
-      padding: 10px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .conference-tables {
-      gap: 12px;
+      font-size: 16px;
+      padding: 12px;
     }
 
-    .conference-section {
-      padding: 8px;
-    }
-
-    .conference-title {
-      font-size: 1rem;
-      margin: 0 0 12px 0;
-      padding: 8px;
-    }
-  }
-
-  /* Mobile adjustments for soccer tables */
-  @media (max-width: 1024px) {
     .soccer-table .table-header,
     .soccer-table .table-row {
-      grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px 50px;
-      font-size: 12px;
-      padding: 12px 14px;
+      grid-template-columns: 35px 1fr 45px 45px 45px 45px 45px 45px 45px 45px;
+      padding: 12px 8px;
+      font-size: 13px;
+      min-height: 56px;
     }
 
     .soccer-table .team-logo-small {
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
     }
 
-    .soccer-table .pos,
+    .soccer-table .team-name {
+      font-size: 14px;
+    }
+
     .soccer-table .played,
     .soccer-table .won,
     .soccer-table .drawn,
@@ -795,89 +875,42 @@
     .soccer-table .ga,
     .soccer-table .gd,
     .soccer-table .points {
-      padding: 3px 6px;
-      font-size: 12px;
+      font-size: 14px;
+      min-height: 40px;
+    }
+
+    .soccer-table .favorite-btn {
+      min-width: 40px;
+      min-height: 40px;
+      font-size: 16px;
+    }
+
+    .control-button,
+    .standings-section .expand-toggle {
+      padding: 10px 16px;
+      min-height: 44px;
+      font-size: 15px;
     }
   }
 
-  @media (max-width: 768px) {
+  /* Landscape mobile optimization */
+  @media (max-width: 768px) and (orientation: landscape) {
     .soccer-table .table-header,
     .soccer-table .table-row {
-      grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 40px 40px 40px;
-      font-size: 11px;
-      padding: 10px 12px;
+      grid-template-columns: 35px 1fr 45px 45px 45px 45px 45px 45px 45px 45px;
+      padding: 12px 8px;
+      min-height: 48px;
     }
 
     .soccer-table .team-logo-small {
-      width: 20px;
-      height: 20px;
-    }
-
-    .soccer-table .team {
-      gap: 8px;
-    }
-
-    .soccer-table .pos,
-    .soccer-table .played,
-    .soccer-table .won,
-    .soccer-table .drawn,
-    .soccer-table .lost,
-    .soccer-table .gf,
-    .soccer-table .ga,
-    .soccer-table .gd,
-    .soccer-table .points {
-      padding: 2px 4px;
-      font-size: 11px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .soccer-table .table-header,
-    .soccer-table .table-row {
-      grid-template-columns: 25px 1.3fr 25px 25px 25px 25px 25px 35px 35px 35px;
-      font-size: 10px;
-      padding: 8px 10px;
-    }
-
-    .soccer-table .team-logo-small {
-      width: 18px;
-      height: 18px;
-    }
-
-    .soccer-table .team {
-      gap: 6px;
-    }
-
-    .soccer-table .pos,
-    .soccer-table .played,
-    .soccer-table .won,
-    .soccer-table .drawn,
-    .soccer-table .lost,
-    .soccer-table .gf,
-    .soccer-table .ga,
-    .soccer-table .gd,
-    .soccer-table .points {
-      padding: 2px 3px;
-      font-size: 10px;
-    }
-  }
-
-  /* Mobile adjustments for favorite buttons */
-  @media (max-width: 768px) {
-    .favorite-btn {
-      min-width: 24px;
+      width: 24px;
       height: 24px;
-      font-size: 12px;
-      padding: 2px 6px;
+      min-width: 24px;
+      min-height: 24px;
     }
-  }
 
-  @media (max-width: 480px) {
-    .favorite-btn {
-      min-width: 22px;
-      height: 22px;
-      font-size: 11px;
-      padding: 2px 4px;
+    .soccer-table .team-name {
+      font-size: 14px;
     }
   }
 </style>
