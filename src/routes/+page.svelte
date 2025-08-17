@@ -4,7 +4,9 @@
   import { onMount, tick } from 'svelte';
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
-
+  import { injectAnalytics } from '@vercel/analytics/sveltekit'
+  
+  injectAnalytics();
   let scoreboardData: ScoreboardData = { leagues: [], lastUpdated: '' };
   let loading = true;
   let refreshing = false;
