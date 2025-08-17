@@ -98,6 +98,12 @@
             {#if team.city}
               <span class="city-badge">{team.city}</span>
             {/if}
+            {#if team.conference}
+              <span class="city-badge">{team.conference}</span>
+            {/if}
+            {#if team.division}
+              <span class="city-badge">{team.division}</span>
+            {/if}
           </div>
           <div class="team-actions">
             <FavoriteButton 
@@ -131,24 +137,26 @@
           <div class="stat-value">{wins}</div>
           <div class="stat-label">Wins</div>
         </div>
+        {#if team.draws}
+          <div class="stat-card">
+            <div class="stat-value">{team.draws}</div>
+            <div class="stat-label">Draws</div>
+          </div>
+        {/if}
         <div class="stat-card">
           <div class="stat-value">{losses}</div>
           <div class="stat-label">Losses</div>
         </div>
+        {#if winPercentage}
         <div class="stat-card">
           <div class="stat-value">{winPercentage}</div>
           <div class="stat-label">Win %</div>
         </div>
+        {/if}
         {#if team.record}
           <div class="stat-card record-card">
             <div class="stat-value">{team.record}</div>
             <div class="stat-label">Record</div>
-          </div>
-        {/if}
-        {#if team.division}
-          <div class="stat-card">
-            <div class="stat-value">{team.division}</div>
-            <div class="stat-label">Division</div>
           </div>
         {/if}
       </div>

@@ -18,6 +18,8 @@ export interface Team {
   losses?: number;
   goalsFor?: number;
   goalsAgainst?: number;
+  goalsDiff?: number;
+  shortDisplayName?: string;
   // MLB-specific properties
   gamesBack?: number;
   divisionGamesBehind?: number;

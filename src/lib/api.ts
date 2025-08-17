@@ -393,33 +393,39 @@ export async function fetchMLSTeams(fetchFn?: typeof globalThis.fetch): Promise<
     if (!data.sports?.[0]?.leagues?.[0]?.teams) {
       return [];
     }
+    
 
-    return data.sports[0].leagues[0].teams.map(espnTeam => {
+    return Promise.all(data.sports[0].leagues[0].teams.map(async (espnTeam) => {
       const team = espnTeam.team;
-      const stats = espnTeam.stats || [];
-      
-      
+
+      const statsResponseUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/teams/${team.id}`;
+
+      const statsResponse = await fetchFunction(statsResponseUrl);
+      const statsData = await statsResponse.json();
+      const stats = statsData.team.record.items[0].stats;
       // Extract logo from team.logos array - logos are inside the team object
       const logo = team.logos?.[0]?.href;
       
       // Extract soccer-specific stats
       const gamesPlayed = stats.find(s => s.name === 'gamesPlayed')?.value || 0;
       const wins = stats.find(s => s.name === 'wins')?.value || 0;
-      const draws = stats.find(s => s.name === 'draws')?.value || 0;
+      const draws = stats.find(s => s.name === 'ties')?.value || 0;
       const losses = stats.find(s => s.name === 'losses')?.value || 0;
-      const goalsFor = stats.find(s => s.name === 'goalsFor')?.value || 0;
-      const goalsAgainst = stats.find(s => s.name === 'goalsAgainst')?.value || 0;
+      const goalsFor = stats.find(s => s.name === 'points')?.value || 0;
+      const goalsAgainst = stats.find(s => s.name === 'pointsAgainst')?.value || 0;
+      const goalsDiff = stats.find(s => s.name === 'pointDifferential')?.value || 0;
       const points = stats.find(s => s.name === 'points')?.value || 0;
-      
-      
+      const conference = statsData.team.groups.id === '1' ? 'Eastern Conference' : 'Western Conference';
+
       return {
         id: team.id,
         name: team.name,
-        city: team.displayName.replace(team.name, '').trim(),
+        city: statsData.team.shortDisplayName,
         abbreviation: team.abbreviation,
         logo: logo,
         primaryColor: team.color,
         secondaryColor: team.alternateColor,
+        conference: conference,
         // Soccer stats
         gamesPlayed,
         wins,
@@ -427,9 +433,10 @@ export async function fetchMLSTeams(fetchFn?: typeof globalThis.fetch): Promise<
         losses,
         goalsFor,
         goalsAgainst,
+        goalsDiff,
         points
       };
-    });
+    }));
   } catch (error) {
     console.error('Error fetching MLS teams:', error);
     return [];

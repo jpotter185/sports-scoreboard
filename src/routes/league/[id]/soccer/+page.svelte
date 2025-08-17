@@ -108,45 +108,144 @@
         </button>
         
         {#if showStandings}
-          <!-- Soccer Table -->
-          <div class="soccer-table">
-            <div class="table-header">
-              <div class="pos">Pos</div>
-              <div class="team">Team</div>
-              <div class="played">P</div>
-              <div class="won">W</div>
-              <div class="drawn">D</div>
-              <div class="lost">L</div>
-              <div class="gf">GF</div>
-              <div class="ga">GA</div>
-              <div class="gd">GD</div>
-              <div class="points">Pts</div>
-            </div>
-            {#each data.teams.sort((a, b) => (b.points || 0) - (a.points || 0)) as team, index (team.id)}
-              <div class="table-row">
-                <div class="pos">{index + 1}</div>
-                <div class="team">
-                  <img src={team.logo} alt={team.name} class="team-logo-small" />
-                  <span class="team-name">{team.city} {team.name}</span>
-                  <button 
-                    class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
-                    on:click={() => favoritesStore.toggleTeam(team.id)}
-                    title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
-                  >
-                    {team.isFavorite ? '★' : '☆'}
-                  </button>
+          {#if league?.id === 'mls' && data.teams.some(team => team.conference)}
+            <!-- MLS Conference Tables -->
+            <div class="conference-tables">
+              <!-- Eastern Conference -->
+              <div class="conference-section">
+                <h3 class="conference-title">Eastern Conference</h3>
+                <div class="soccer-table">
+                  <div class="table-header">
+                    <div class="pos">Pos</div>
+                    <div class="team">Team</div>
+                    <div class="played">GP</div>
+                    <div class="won">W</div>
+                    <div class="drawn">D</div>
+                    <div class="lost">L</div>
+                    <div class="gf">GF</div>
+                    <div class="ga">GA</div>
+                    <div class="gd">GD</div>
+                    <div class="points">Pts</div>
+                  </div>
+                  {#each data.teams
+                    .filter(team => team.conference === 'Eastern Conference')
+                    .sort((a, b) => (b.points || 0) - (a.points || 0)) as team, index (team.id)}
+                    <div class="table-row">
+                      <div class="pos">{index + 1}</div>
+                      <div class="team">
+                        <a href="/team/{league.id}/{team.id}">
+                          <img src={team.logo} alt={team.name} class="team-logo-small" />
+                          <span class="team-name">{team.name}</span>
+                        </a>
+                        <button 
+                          class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
+                          on:click={() => favoritesStore.toggleTeam(team.id)}
+                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                        >
+                          {team.isFavorite ? '★' : '☆'}
+                        </button>
+                      </div>
+                      <div class="played">{team.gamesPlayed || 0}</div>
+                      <div class="won">{team.wins || 0}</div>
+                      <div class="drawn">{team.draws || 0}</div>
+                      <div class="lost">{team.losses || 0}</div>
+                      <div class="gf">{team.goalsFor || 0}</div>
+                      <div class="ga">{team.goalsAgainst || 0}</div>
+                      <div class="gd">{(team.goalsDiff)}</div>
+                      <div class="points">{team.points || 0}</div>
+                    </div>
+                  {/each}
                 </div>
-                <div class="played">{team.gamesPlayed || 0}</div>
-                <div class="won">{team.wins || 0}</div>
-                <div class="drawn">{team.draws || 0}</div>
-                <div class="lost">{team.losses || 0}</div>
-                <div class="gf">{team.goalsFor || 0}</div>
-                <div class="ga">{team.goalsAgainst || 0}</div>
-                <div class="gd">{(team.goalsFor || 0) - (team.goalsAgainst || 0)}</div>
-                <div class="points">{team.points || 0}</div>
               </div>
-            {/each}
-          </div>
+
+              <!-- Western Conference -->
+              <div class="conference-section">
+                <h3 class="conference-title">Western Conference</h3>
+                <div class="soccer-table">
+                  <div class="table-header">
+                    <div class="pos">Pos</div>
+                    <div class="team">Team</div>
+                    <div class="played">GP</div>
+                    <div class="won">W</div>
+                    <div class="drawn">D</div>
+                    <div class="lost">L</div>
+                    <div class="gf">GF</div>
+                    <div class="ga">GA</div>
+                    <div class="gd">GD</div>
+                    <div class="points">Pts</div>
+                  </div>
+                  {#each data.teams
+                    .filter(team => team.conference === 'Western Conference')
+                    .sort((a, b) => (b.points || 0) - (a.points || 0)) as team, index (team.id)}
+                    <div class="table-row">
+                      <div class="pos">{index + 1}</div>
+                      <div class="team">
+                        <a href="/team/{league.id}/{team.id}">
+                        <img src={team.logo} alt={team.name} class="team-logo-small" />
+                        <span class="team-name">{team.name}</span>
+                      </a>
+                        <button 
+                          class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
+                          on:click={() => favoritesStore.toggleTeam(team.id)}
+                          title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                        >
+                          {team.isFavorite ? '★' : '☆'}
+                        </button>
+                      </div>
+                      <div class="played">{team.gamesPlayed || 0}</div>
+                      <div class="won">{team.wins || 0}</div>
+                      <div class="drawn">{team.draws || 0}</div>
+                      <div class="lost">{team.losses || 0}</div>
+                      <div class="gf">{team.goalsFor || 0}</div>
+                      <div class="ga">{team.goalsAgainst || 0}</div>
+                      <div class="gd">{(team.goalsDiff)}</div>
+                      <div class="points">{team.points || 0}</div>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            </div>
+          {:else}
+            <!-- Single Table for EPL or other leagues -->
+            <div class="soccer-table">
+              <div class="table-header">
+                <div class="pos">Pos</div>
+                <div class="team">Team</div>
+                <div class="played">GP</div>
+                <div class="won">W</div>
+                <div class="drawn">D</div>
+                <div class="lost">L</div>
+                <div class="gf">GF</div>
+                <div class="ga">GA</div>
+                <div class="gd">GD</div>
+                <div class="points">Pts</div>
+              </div>
+              {#each data.teams.sort((a, b) => (b.points || 0) - (a.points || 0)) as team, index (team.id)}
+                <div class="table-row">
+                  <div class="pos">{index + 1}</div>
+                  <div class="team">
+                    <img src={team.logo} alt={team.name} class="team-logo-small" />
+                    <span class="team-name">{team.city} {team.name}</span>
+                    <button 
+                      class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
+                      on:click={() => favoritesStore.toggleTeam(team.id)}
+                      title="{team.isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
+                    >
+                      {team.isFavorite ? '★' : '☆'}
+                    </button>
+                  </div>
+                  <div class="played">{team.gamesPlayed || 0}</div>
+                  <div class="won">{team.wins || 0}</div>
+                  <div class="drawn">{team.draws || 0}</div>
+                  <div class="lost">{team.losses || 0}</div>
+                  <div class="gf">{team.goalsFor || 0}</div>
+                  <div class="ga">{team.goalsAgainst || 0}</div>
+                  <div class="gd">{(team.goalsDiff)}</div>
+                  <div class="points">{team.points || 0}</div>
+                </div>
+              {/each}
+            </div>
+          {/if}
         {/if}
       </div>
     </div>
@@ -268,21 +367,54 @@
     transition: transform 0.2s ease;
   }
 
+  /* Conference Tables Styles */
+  .conference-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .conference-section {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .conference-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 16px 0;
+    text-align: center;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+
   /* Soccer Table Styles */
   .soccer-table {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
   .soccer-table .table-header {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
+    grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px 50px;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     font-weight: 700;
     color: #374151;
-    font-size: 13px;
-    padding: 16px;
+    font-size: 12px;
+    padding: 12px 14px;
     border-bottom: 2px solid #e5e7eb;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -290,11 +422,11 @@
 
   .soccer-table .table-row {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
-    padding: 14px 16px;
+    grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px 50px;
+    padding: 10px 14px;
     border-bottom: 1px solid #f3f4f6;
     align-items: center;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.2s ease;
   }
 
@@ -320,9 +452,9 @@
     color: #1e293b;
     text-align: center;
     background: #f1f5f9;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
   }
 
   .soccer-table .team {
@@ -330,12 +462,12 @@
     color: #111827;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
   .soccer-table .team-logo-small {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e5e7eb;
@@ -349,32 +481,102 @@
     font-weight: 600;
   }
 
+  /* Team link styling */
+  .soccer-table .team a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+  }
+
+  .soccer-table .team a:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+
   .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
     text-align: center;
-    color: #6b7280;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost {
+    background: #f8fafc;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .soccer-table .gf {
+    background: #f0f9ff;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    color: #0369a1;
+  }
+
+  .soccer-table .ga {
+    background: #fef3c7;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    color: #92400e;
+  }
+
+  .soccer-table .gd {
+    background: #f3e8ff;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    color: #7c3aed;
   }
 
   .soccer-table .points {
-    font-weight: 600;
-    color: #111827;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    color: white;
+    font-weight: 700;
   }
 
-  .soccer-table .favorite-btn {
-    background: none;
-    border: none;
-    color: #6b7280;
+  .favorite-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #94a3b8;
+    border-radius: 4px;
+    padding: 3px 6px;
     cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .soccer-table .favorite-btn:hover {
-    color: #3b82f6;
+  .favorite-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #64748b;
+    transform: scale(1.05);
   }
 
-  .soccer-table .favorite-btn.favorited {
-    color: #3b82f6;
+  .favorite-btn.favorited {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #f59e0b;
+    color: white;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  }
+
+  .favorite-btn.favorited:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: #d97706;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
   }
 
   /* Loading and Error States */
@@ -484,172 +686,158 @@
     }
   }
 
-  /* Soccer Table Styles */
-  .soccer-table {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
+  /* Conference Tables Styles */
+  .conference-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .conference-section {
     background: white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  }
-
-  .soccer-table .table-header {
-    display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    font-weight: 700;
-    color: #374151;
-    font-size: 13px;
+    border-radius: 8px;
     padding: 16px;
-    border-bottom: 2px solid #e5e7eb;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
-  .soccer-table .table-row {
-    display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
-    padding: 14px 16px;
-    border-bottom: 1px solid #f3f4f6;
-    align-items: center;
-    font-size: 14px;
-    transition: all 0.2s ease;
-  }
-
-  .soccer-table .table-row:hover {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    transform: translateX(2px);
-  }
-
-  .soccer-table .table-row:nth-child(even) {
-    background: #fafbfc;
-  }
-
-  .soccer-table .table-row:nth-child(even):hover {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  }
-
-  .soccer-table .table-row:last-child {
-    border-bottom: none;
-  }
-
-  .soccer-table .pos {
+  .conference-title {
+    font-size: 1.1rem;
     font-weight: 700;
-    color: #1e293b;
-    text-align: center;
-    background: #f1f5f9;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-  }
-
-  .soccer-table .team {
-    font-weight: 500;
     color: #111827;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .soccer-table .team-logo-small {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e5e7eb;
-  }
-
-  .soccer-table .team-name {
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 600;
-  }
-
-  .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+    margin: 0 0 16px 0;
     text-align: center;
-    font-weight: 600;
-    color: #374151;
-  }
-
-  .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost {
-    background: #f8fafc;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border: 1px solid #e5e7eb;
   }
 
-  .soccer-table .gf {
-    background: #f0f9ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: #0369a1;
+  /* Mobile adjustments for conference tables */
+  @media (max-width: 1024px) {
+    .conference-tables {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .conference-section {
+      padding: 16px;
+    }
   }
 
-  .soccer-table .ga {
-    background: #fef3c7;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: #92400e;
+  @media (max-width: 768px) {
+    .conference-tables {
+      gap: 16px;
+      margin-top: 12px;
+    }
+    
+    .conference-section {
+      padding: 12px;
+    }
+    
+    .conference-title {
+      font-size: 1.1rem;
+      margin: 0 0 16px 0;
+      padding: 10px;
+    }
   }
 
-  .soccer-table .gd {
-    background: #f3e8ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: #7c3aed;
+  @media (max-width: 480px) {
+    .conference-tables {
+      gap: 12px;
+    }
+    
+    .conference-section {
+      padding: 8px;
+    }
+    
+    .conference-title {
+      font-size: 1rem;
+      margin: 0 0 12px 0;
+      padding: 8px;
+    }
   }
 
-  .soccer-table .points {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
-    color: white;
-    font-weight: 700;
+  /* Mobile adjustments for soccer tables */
+  @media (max-width: 1024px) {
+    .soccer-table .table-header, .soccer-table .table-row {
+      grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px 50px;
+      font-size: 12px;
+      padding: 12px 14px;
+    }
+    
+    .soccer-table .team-logo-small {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+      padding: 3px 6px;
+      font-size: 12px;
+    }
   }
 
-  .favorite-btn {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    color: #94a3b8;
-    border-radius: 6px;
-    padding: 4px 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    min-width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  @media (max-width: 768px) {
+    .soccer-table .table-header, .soccer-table .table-row {
+      grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 40px 40px 40px;
+      font-size: 11px;
+      padding: 10px 12px;
+    }
+    
+    .soccer-table .team-logo-small {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .soccer-table .team {
+      gap: 8px;
+    }
+    
+    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+      padding: 2px 4px;
+      font-size: 11px;
+    }
   }
 
-  .favorite-btn:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #64748b;
-    transform: scale(1.05);
+  @media (max-width: 480px) {
+    .soccer-table .table-header, .soccer-table .table-row {
+      grid-template-columns: 25px 1.3fr 25px 25px 25px 25px 25px 35px 35px 35px;
+      font-size: 10px;
+      padding: 8px 10px;
+    }
+    
+    .soccer-table .team-logo-small {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .soccer-table .team {
+      gap: 6px;
+    }
+    
+    .soccer-table .pos, .soccer-table .played, .soccer-table .won, .soccer-table .drawn, .soccer-table .lost, .soccer-table .gf, .soccer-table .ga, .soccer-table .gd, .soccer-table .points {
+      padding: 2px 3px;
+      font-size: 10px;
+    }
   }
 
-  .favorite-btn.favorited {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    border-color: #f59e0b;
-    color: white;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  /* Mobile adjustments for favorite buttons */
+  @media (max-width: 768px) {
+    .favorite-btn {
+      min-width: 24px;
+      height: 24px;
+      font-size: 12px;
+      padding: 2px 6px;
+    }
   }
 
-  .favorite-btn.favorited:hover {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border-color: #d97706;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  @media (max-width: 480px) {
+    .favorite-btn {
+      min-width: 22px;
+      height: 22px;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
   }
 </style>
