@@ -1,33 +1,60 @@
 <script lang="ts">
   import type { League } from '$lib/types';
   import GameCard from './GameCard.svelte';
+  import TeamCard from './TeamCard.svelte';
+  import FavoriteButton from './FavoriteButton.svelte';
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
   import { browser } from '$app/environment';
+  import { favoritesStore } from '$lib/favorites';
 
   export let league: League;
-  export let forceCollapse: boolean = false;
   export let reorderMode: boolean = false;
+  export let forceCollapse: boolean = false;
   export let forceExpand: boolean = false;
-  let collapsed = false;
+  export let showTeams: boolean = false;
+  export let showFavoritesOnly: boolean = false;
+
+  // Direct subscription to favorites store for real-time updates
+  $: leagueIsFavorite = $favoritesStore.leagues.includes(league.id);
+  $: teamsWithFavorites = league.teams.map(team => ({
+    ...team,
+    isFavorite: $favoritesStore.teams.includes(team.id)
+  }));
+
+  let expanded = false;
   // Apply jump-driven overrides to the real collapsed state
-  $: if (forceExpand) collapsed = false;
-  $: if (forceCollapse) collapsed = true;
+  $: if (forceExpand) expanded = false;
+  $: if (forceCollapse) expanded = true;
   const dispatch = createEventDispatcher();
 
   // Read initial collapsed state synchronously on the client to avoid flicker on first paint
   if (browser) {
     try {
       const saved = localStorage.getItem(`leagueCollapsed:${league?.id ?? ''}`);
-      if (saved !== null) collapsed = saved === '1';
+      if (saved !== null) expanded = saved === '1';
     } catch {}
   }
 
-  // Sort games by date (oldest first)
-  $: sortedGames = [...league.games].sort((a, b) => {
-    if (!a.date || !b.date) return 0;
-    return new Date(a.date).getTime() - new Date(b.date).getTime();
-  });
+  // Sort games by date (oldest first) and filter by favorites if needed
+  $: sortedGames = (() => {
+    let games = [...league.games];
+    
+    // Filter to show only games involving favorite teams if showFavoritesOnly is true
+    if (showFavoritesOnly) {
+      games = games.filter(game => {
+        const homeTeamInternalId = `${league.id}-${game.homeTeam.id}`;
+        const awayTeamInternalId = `${league.id}-${game.awayTeam.id}`;
+        return $favoritesStore.teams.includes(homeTeamInternalId) || $favoritesStore.teams.includes(awayTeamInternalId);
+      });
+    }
+    
+    // Sort by date (oldest first)
+    return games.sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+  })();
 
   let storageKey: string;
   $: storageKey = `leagueCollapsed:${league.id}`;
@@ -35,14 +62,18 @@
   onMount(() => {
     try {
       const saved = localStorage.getItem(storageKey);
-      if (saved !== null) collapsed = saved === '1';
+      if (saved !== null) expanded = saved === '1';
     } catch {}
   });
 
-  $: try { if (typeof window !== 'undefined') localStorage.setItem(storageKey, collapsed ? '1' : '0'); } catch {}
+  $: try { if (typeof window !== 'undefined') localStorage.setItem(storageKey, expanded ? '1' : '0'); } catch {}
 
   function toggleCollapse() {
-    collapsed = !collapsed;
+    expanded = !expanded;
+  }
+
+  function toggleFavorite() {
+    favoritesStore.toggleLeague(league.id);
   }
 </script>
 
@@ -79,6 +110,11 @@
     font-weight: bold;
     color: #111827;
     margin-bottom: 8px;
+  }
+
+  .league-title-link {
+    text-decoration: none;
+    color: inherit;
   }
 
   .collapse-button {
@@ -186,6 +222,29 @@
     padding: 16px;
     margin-bottom: 24px;
   }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .teams-section {
+    margin-bottom: 24px;
+  }
+
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .games-section {
+    margin-bottom: 16px;
+  }
   
   .no-games {
     text-align: center;
@@ -238,18 +297,25 @@
             <circle cx="10" cy="14" r="1.5" />
           </svg>
         </span>
-        <h2 class="league-title">{league.name}</h2>
+        <a href="/league/{league.id}" class="league-title-link">
+          <h2 class="league-title">{league.name}</h2>
+        </a>
       </div>
       <div class="right-controls">
+        <FavoriteButton 
+          isFavorite={leagueIsFavorite} 
+          size="medium"
+          on:toggle={toggleFavorite}
+        />
         {#if reorderMode}
           <button class="reorder-btn" on:click={() => dispatch('moveUp')}>↑</button>
           <button class="reorder-btn" on:click={() => dispatch('moveDown')}>↓</button>
         {/if}
-        <button class="collapse-button" on:click={() => { if (reorderMode) dispatch('exitReorder'); dispatch('clearJump'); toggleCollapse(); }} aria-expanded={!collapsed} aria-controls={`grid-${league.id}`}>
-          <svg class="chevron" class:rotate={collapsed} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <button class="collapse-button" on:click={() => { if (reorderMode) dispatch('exitReorder'); dispatch('clearJump'); toggleCollapse(); }} aria-expanded={!expanded} aria-controls={`grid-${league.id}`}>
+          <svg class="chevron" class:rotate={expanded} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
           </svg>
-          {collapsed ? 'Expand' : 'Collapse'}
+          {expanded ? 'Expand' : 'Collapse'}
         </button>
       </div>
     </div>
@@ -292,13 +358,29 @@
   </div>
 
   <!-- Games Grid -->
-  {#if !collapsed}
+  {#if !expanded}
     <div class="league-body" id={`grid-${league.id}`} in:slide={{ duration: 180 }} out:slide={{ duration: 140 }}>
+      <!-- Teams Section -->
+      {#if showTeams}
+        <div class="teams-section">
+          <h3 class="section-title">Teams</h3>
+          <div class="teams-grid">
+            {#each league.teams as team (team.id)}
+              <TeamCard {team} />
+            {/each}
+          </div>
+        </div>
+      {/if}
+      
+      <!-- Games Section -->
       {#if league.games.length > 0}
-        <div class="games-grid">
-          {#each sortedGames as game (game.id)}
-            <GameCard {game} />
-          {/each}
+        <div class="games-section">
+          <h3 class="section-title">Games</h3>
+          <div class="games-grid">
+            {#each sortedGames as game (game.id)}
+              <GameCard {game} backTo="/" leagueId={league.id} />
+            {/each}
+          </div>
         </div>
       {:else}
         <div class="no-games">

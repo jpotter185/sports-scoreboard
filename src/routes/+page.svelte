@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { getScoreboardData } from '$lib/data';
   import LeagueSection from '$lib/components/LeagueSection.svelte';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
   import { injectAnalytics } from '@vercel/analytics/sveltekit'
   import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+  import { favoritesStore, favoriteTeams, favoriteLeagues, applyFavoriteStatus } from '$lib/favorites';
+  import type { PageData } from './$types';
+
+  export let data: PageData;
 
   injectSpeedInsights();
   injectAnalytics();
-  let scoreboardData: ScoreboardData = { leagues: [], lastUpdated: '' };
-  let loading = true;
+  let scoreboardData: ScoreboardData = data.scoreboardData;
+  let loading = false;
   let refreshing = false;
   let error: string | null = null;
   let leagueOrder: string[] = [];
@@ -20,24 +23,35 @@
   let dragOverPosition: 'before' | 'after' | null = null;
   let reorderMode = false;
   let liveOnly = false;
-  let jumpTarget: string | null = null;
-  async function onJumpLeague(id: string) {
-    reorderMode = false;
-    jumpTarget = id;
-    await tick();
-    // Scroll after expand transition has started
-    setTimeout(() => {
-      const el = document.getElementById(`league-${id}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 220); // slightly longer than in:slide duration
-  }
+  let showFavoritesOnly = false;
+
+  // Create reactive data that updates when favorites change
+  $: reactiveScoreboardData = (() => {
+    try {
+      if (!scoreboardData.leagues.length) {
+        return scoreboardData;
+      }
+      
+      // Since components now handle favorites directly, just return the original data
+      // The reactive logic is now handled at the component level
+      return scoreboardData;
+    } catch (error) {
+      console.error('❌ Error in reactive favorites logic:', error);
+      return scoreboardData; // Fallback to original data
+    }
+  })();
 
   // Auto-refresh every 30 seconds
-  onMount(async () => {
-    await loadData();
+  onMount(() => {
+    // Migrate favorites if needed
+    if (scoreboardData.leagues.length > 0) {
+      favoritesStore.migrateFavorites(scoreboardData.leagues);
+    }
 
-    const interval = setInterval(async () => {
-      await loadData({ background: true });
+    const interval = setInterval(() => {
+      // For now, we'll just refresh the page to get new data
+      // In the future, we could implement client-side refresh
+      window.location.reload();
     }, 30000);
 
     // restore liveOnly preference
@@ -46,29 +60,18 @@
       if (savedLive != null) liveOnly = savedLive === '1';
     } catch {}
 
-    return () => clearInterval(interval);
+    // restore showFavoritesOnly preference
+    try {
+      const savedFavorites = localStorage.getItem('showFavoritesOnly');
+      if (savedFavorites != null) showFavoritesOnly = savedFavorites === '1';
+    } catch {}
+
+    return () => {
+      clearInterval(interval);
+    };
   });
 
-  async function loadData({ background = false }: { background?: boolean } = {}) {
-    try {
-      if (background) {
-        refreshing = true;
-      } else {
-        loading = true;
-      }
-      error = null;
-      scoreboardData = await getScoreboardData();
-    } catch (err) {
-      error = 'Failed to load scoreboard data';
-      console.error('Error loading data:', err);
-    } finally {
-      if (background) {
-        refreshing = false;
-      } else {
-        loading = false;
-      }
-    }
-  }
+
 
   // Derive and persist league order
   $: if (scoreboardData.leagues && scoreboardData.leagues.length > 0) {
@@ -111,15 +114,32 @@
     try { localStorage.setItem('liveOnly', liveOnly ? '1' : '0'); } catch {}
   }
 
+  // persist showFavoritesOnly
+  $: if (browser) {
+    try { localStorage.setItem('showFavoritesOnly', showFavoritesOnly ? '1' : '0'); } catch {}
+  }
+
   // Apply live-only filtering to leagues/games for display
   $: filteredLeagues = scoreboardData.leagues.map((l) => ({
     ...l,
     games: liveOnly ? l.games.filter((g) => g.status === 'live') : l.games
   })).filter((l) => (liveOnly ? l.games.length > 0 : true));
 
-  $: orderedLeagues = leagueOrder
-    .map((id) => filteredLeagues.find((l) => l.id === id))
-    .filter((l): l is League => !!l);
+  // Apply favorites-only filtering (now using internal team IDs)
+  $: finalFilteredLeagues = showFavoritesOnly 
+    ? filteredLeagues.filter(l => $favoritesStore.leagues.includes(l.id) || l.games.some(g => {
+        const homeTeamInternalId = `${l.id}-${g.homeTeam.id}`;
+        const awayTeamInternalId = `${l.id}-${g.awayTeam.id}`;
+        return $favoritesStore.teams.includes(homeTeamInternalId) || $favoritesStore.teams.includes(awayTeamInternalId);
+      }))
+    : filteredLeagues;
+
+  $: orderedLeagues = (() => {
+    const result = leagueOrder
+      .map((id) => finalFilteredLeagues.find((l) => l.id === id))
+      .filter((l): l is League => !!l);
+    return result;
+  })();
 
   function onDragStart(event: DragEvent, id: string) {
     const target = event.target as HTMLElement | null;
@@ -178,12 +198,35 @@
   }
 
   async function refreshData() {
-    await loadData({ background: true });
+    // For now, we'll just refresh the page to get new data
+    // In the future, we could implement client-side refresh
+    window.location.reload();
   }
 
   $: totalGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.length, 0);
   $: liveGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.filter(g => g.status === 'live').length, 0);
   $: finalGames = scoreboardData.leagues.reduce((sum, league) => sum + league.games.filter(g => g.status === 'final').length, 0);
+  $: favoriteTeamsCount = $favoriteTeams.length;
+  $: favoriteLeaguesCount = $favoriteLeagues.length;
+
+  // Function to get team info from internal team ID
+  function getTeamInfo(internalTeamId: string) {
+    if (!internalTeamId.includes('-')) return null;
+    
+    const [leagueId, espnId] = internalTeamId.split('-');
+    const league = scoreboardData.leagues.find(l => l.id === leagueId);
+    if (!league) return null;
+    
+    const team = league.teams.find(t => t.id === espnId);
+    if (!team) return null;
+    
+    return {
+      leagueId,
+      espnId,
+      team,
+      leagueName: league.name
+    };
+  }
 </script>
 
 <style>
@@ -398,21 +441,179 @@
     transform: scale(0.995);
   }
 
-  .drop-indicator {
-    height: 10px;
-    margin: -6px 0 16px 0;
-    display: none;
+  /* New styles for favorite teams section */
+  .favorite-teams-section {
+    margin-top: 24px;
+    padding: 24px;
+    background: #f9fafb;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
   }
 
-  .drop-indicator.show {
-    display: block;
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 16px;
+    text-align: center;
   }
 
-  .drop-line {
-    height: 4px;
-    background: #3b82f6;
-    border-radius: 9999px;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  .favorite-teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    justify-items: center;
+  }
+
+  .favorite-team-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #334155;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 150px;
+  }
+
+  .favorite-team-card:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .team-logo {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .team-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .team-logo-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4b5563;
+  }
+
+  .team-info {
+    text-align: center;
+    width: 100%;
+  }
+
+  .team-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .team-league {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .team-record {
+    font-size: 0.75rem;
+    color: #4b5563;
+  }
+
+  /* Favorite Teams Section */
+  .favorite-teams-section {
+    margin: 32px 0;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .favorite-teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .favorite-team-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+  }
+
+  .favorite-team-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #3b82f6;
+  }
+
+  .favorite-team-card .team-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+  }
+
+  .favorite-team-card .team-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .favorite-team-card .team-league {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .favorite-team-card .team-record {
+    font-size: 0.9rem;
+    color: #059669;
+    font-weight: 600;
+    text-align: center;
   }
 </style>
 
@@ -449,7 +650,7 @@
     <div class="stats-bar">
       <div class="leagues-nav">
         {#each orderedLeagues as l (l.id)}
-          <a class="nav-chip" href={`#league-${l.id}`} on:click|preventDefault={() => onJumpLeague(l.id)}>
+          <a class="nav-chip" href="/league/{l.id}">
             {l.id === 'nfl' ? '🏈 NFL' : l.id === 'mls' ? '⚽ MLS' : l.id === 'mlb' ? '⚾ MLB' : '⚽ EPL'}
           </a>
         {/each}
@@ -462,26 +663,63 @@
         <button class="reorder-toggle" on:click={() => (liveOnly = !liveOnly)} aria-pressed={liveOnly}>
           {liveOnly ? 'Show All Games' : 'Show Live Only'}
         </button>
+        <button class="reorder-toggle" on:click={() => (showFavoritesOnly = !showFavoritesOnly)} aria-pressed={showFavoritesOnly}>
+          {showFavoritesOnly ? 'Show All Teams' : 'Show Favorites Only'}
+        </button>
       </div>
+
+      {#if favoriteTeamsCount > 0 || favoriteLeaguesCount > 0}
+        <div style="margin-top: 12px; padding: 12px; background: #fef3c7; border-radius: 8px; border: 1px solid #fde68a;">
+          <div style="text-align: center; font-size: 14px; color: #92400e;">
+            <span>⭐</span> You have {favoriteTeamsCount} favorite team{favoriteTeamsCount !== 1 ? 's' : ''} and {favoriteLeaguesCount} favorite league{favoriteLeaguesCount !== 1 ? 's' : ''}
+          </div>
+        </div>
+      {/if}
+
+      <!-- My Favorite Teams Section -->
+      {#if favoriteTeamsCount > 0}
+        <div class="favorite-teams-section">
+          <h2 class="section-title">⭐ My Favorite Teams</h2>
+          <div class="favorite-teams-grid">
+            {#each $favoritesStore.teams as internalTeamId}
+              {@const teamInfo = getTeamInfo(internalTeamId)}
+              {#if teamInfo}
+                <a href="/team/{teamInfo.leagueId}/{teamInfo.espnId}" class="favorite-team-card">
+                  <div class="team-logo">
+                    {#if teamInfo.team.logo}
+                      <img src={teamInfo.team.logo} alt="{teamInfo.team.name} logo" loading="lazy" />
+                    {:else}
+                      <div class="team-logo-fallback">
+                        {teamInfo.team.abbreviation}
+                      </div>
+                    {/if}
+                  </div>
+                  <div class="team-info">
+                    <div class="team-name">{teamInfo.team.name}</div>
+                    <div class="team-league">{teamInfo.leagueName}</div>
+                    {#if teamInfo.team.record}
+                      <div class="team-record">{teamInfo.team.record}</div>
+                    {/if}
+                  </div>
+                </a>
+              {/if}
+            {/each}
+          </div>
+        </div>
+      {/if}
     </div>
 
     <!-- Leagues -->
     {#if orderedLeagues.length > 0}
       {#each orderedLeagues as league (league.id)}
         <div class="league-draggable {draggingId === league.id ? 'dragging' : ''}" role="listitem" aria-grabbed={draggingId === league.id} on:dragstart={(e) => onDragStart(e, league.id)} on:dragover={(e) => onDragOver(e, league.id)} on:drop={onDrop} on:dragend={onDragEnd}>
-          {#if dragOverId === league.id && dragOverPosition === 'before'}
-            <div class="drop-indicator show"><div class="drop-line"></div></div>
-          {/if}
           <LeagueSection {league} {reorderMode}
-            forceCollapse={draggingId !== null || reorderMode || (jumpTarget && jumpTarget !== league.id)}
-            forceExpand={jumpTarget === league.id}
+            forceCollapse={draggingId !== null || reorderMode}
+            showTeams={false}
+            {showFavoritesOnly}
             on:moveUp={() => moveLeague(league.id, 'up')}
             on:moveDown={() => moveLeague(league.id, 'down')}
-            on:exitReorder={() => (reorderMode = false)}
-            on:clearJump={() => { if (jumpTarget === league.id) jumpTarget = null; }} />
-          {#if dragOverId === league.id && dragOverPosition === 'after'}
-            <div class="drop-indicator show"><div class="drop-line"></div></div>
-          {/if}
+            on:exitReorder={() => (reorderMode = false)} />
         </div>
       {/each}
     {:else}

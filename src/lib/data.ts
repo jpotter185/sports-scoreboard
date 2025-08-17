@@ -1,28 +1,20 @@
 import type { ScoreboardData, League, Team, Game } from './types';
-import { fetchNFLGames, fetchMLSGames, fetchEPLGames, fetchMLBGames } from './api';
+import { fetchNFLGames, fetchMLSGames, fetchEPLGames, fetchMLBGames, fetchNFLTeams, fetchMLSTeams, fetchEPLTeams, fetchMLBTeams } from './api';
 
-function deriveTeamsFromGames(games: Game[]): Team[] {
-  const teams = new Map<string, Team>();
-  for (const game of games) {
-    if (game.homeTeam) teams.set(game.homeTeam.id, game.homeTeam);
-    if (game.awayTeam) teams.set(game.awayTeam.id, game.awayTeam);
-  }
-  return Array.from(teams.values());
-}
 
-export async function getScoreboardData(): Promise<ScoreboardData> {
+
+export async function getScoreboardData(fetch?: typeof globalThis.fetch): Promise<ScoreboardData> {
   try {
-    const [nflGames, mlsGames, eplGames, mlbGames] = await Promise.all([
-      fetchNFLGames(),
-      fetchMLSGames(),
-      fetchEPLGames(),
-      fetchMLBGames()
+    const [nflGames, mlsGames, eplGames, mlbGames, nflTeams, mlsTeams, eplTeams, mlbTeams] = await Promise.all([
+      fetchNFLGames(undefined, undefined, fetch),
+      fetchMLSGames(fetch),
+      fetchEPLGames(fetch),
+      fetchMLBGames(fetch),
+      fetchNFLTeams(fetch),
+      fetchMLSTeams(fetch),
+      fetchEPLTeams(fetch),
+      fetchMLBTeams(fetch)
     ]);
-
-    const nflTeams = deriveTeamsFromGames(nflGames);
-    const mlsTeams = deriveTeamsFromGames(mlsGames);
-    const eplTeams = deriveTeamsFromGames(eplGames);
-    const mlbTeams = deriveTeamsFromGames(mlbGames);
 
     const nfl: League = {
       id: 'nfl',

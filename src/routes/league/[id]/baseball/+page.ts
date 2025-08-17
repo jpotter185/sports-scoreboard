@@ -1,0 +1,30 @@
+import type { PageLoad } from './$types';
+import { fetchMLBTeams } from '$lib/api';
+import { getScoreboardData } from '$lib/data';
+
+export const load: PageLoad = async ({ params, fetch }) => {
+  try {
+    const scoreboardData = await getScoreboardData(fetch);
+    const league = scoreboardData.leagues.find(l => l.id === params.id);
+    
+    if (!league) {
+      return {
+        league: null,
+        teams: []
+      };
+    }
+
+    const teams = await fetchMLBTeams(fetch);
+    
+    return {
+      league,
+      teams
+    };
+  } catch (error) {
+    console.error('Error loading baseball page:', error);
+    return {
+      league: null,
+      teams: []
+    };
+  }
+};

@@ -1,7 +1,17 @@
 <script lang="ts">
   import type { Game } from '$lib/types';
+  import FavoriteButton from './FavoriteButton.svelte';
+  import { favoritesStore } from '$lib/favorites';
 
   export let game: Game;
+  export let backTo: string = '/'; // Default to homepage
+  export let leagueId: string = ''; // League ID for generating internal team IDs
+
+  // Direct subscription to favorites store for real-time updates
+  $: awayTeamInternalId = leagueId ? `${leagueId}-${game.awayTeam.id}` : `unknown-${game.awayTeam.id}`;
+  $: homeTeamInternalId = leagueId ? `${leagueId}-${game.homeTeam.id}` : `unknown-${game.homeTeam.id}`;
+  $: awayTeamIsFavorite = $favoritesStore.teams.includes(awayTeamInternalId);
+  $: homeTeamIsFavorite = $favoritesStore.teams.includes(homeTeamInternalId);
 
   $: isLive = game.status === 'live';
   $: isFinal = game.status === 'final';
@@ -42,6 +52,14 @@
   $: gameDate = game.date ? new Date(game.date) : null;
   $: displayDate = gameDate ? gameDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '';
   $: displayTime = gameDate ? gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }) : '';
+
+  function toggleAwayTeamFavorite() {
+    favoritesStore.toggleTeam(awayTeamInternalId);
+  }
+
+  function toggleHomeTeamFavorite() {
+    favoritesStore.toggleTeam(homeTeamInternalId);
+  }
 </script>
 
 <style>
@@ -53,6 +71,8 @@
     padding: 16px;
     transition: all 0.3s ease;
     min-height: 200px;
+    position: relative;
+    cursor: pointer;
   }
 
   /* Status-based tile accents */
@@ -71,6 +91,41 @@
   .game-card:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
+  }
+
+  /* Card link overlay */
+  .card-link-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-link-overlay .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Ensure interactive elements are above the overlay */
+  .team-actions {
+    position: relative;
+    z-index: 2;
+  }
+
+  .external-link-button {
+    position: relative;
+    z-index: 2;
   }
   
   .status-header {
@@ -184,6 +239,12 @@
     align-items: center;
     gap: 12px;
   }
+
+  .team-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   
   .team-logo {
     width: 36px;
@@ -276,10 +337,29 @@
     padding-top: 12px;
     border-top: 1px solid #e5e7eb;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
   
   .date-text {
     font-size: 11px;
+    color: #6b7280;
+  }
+
+  .external-link-button {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .external-link-button:hover {
     color: #6b7280;
   }
 
@@ -331,20 +411,25 @@
     color: #991b1b;
   }
 
-  .card-link {
+
+
+  .external-link-button {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
     text-decoration: none;
-    color: inherit;
-    display: block;
+    transition: color 0.2s ease;
   }
 
-  .card-link.no-link {
-    pointer-events: none;
-    cursor: default;
+  .external-link-button:hover {
+    color: #6b7280;
   }
 </style>
 
 <div class="game-card" class:live={isLive} class:final={isFinal} class:scheduled={isScheduled}>
-  <a href={game.url || '#'} target={game.url ? '_blank' : undefined} rel={game.url ? 'noopener noreferrer' : undefined} class="card-link" class:no-link={!game.url}>
   <!-- Game Status Header -->
   <div class="status-header">
     <div class="status-info">
@@ -399,13 +484,20 @@
             {/if}
           </div>
         </div>
-        {#if !isScheduled}
-        <div class="team-score" 
-             class:winning-score={isFinal && game.awayScore > game.homeScore}
-             class:losing-score={isFinal && (game.awayScore < game.homeScore || game.awayScore === game.homeScore)}>
-          {game.awayScore}
+        <div class="team-actions">
+          <FavoriteButton 
+            isFavorite={awayTeamIsFavorite} 
+            size="small"
+            on:toggle={toggleAwayTeamFavorite}
+          />
+          {#if !isScheduled}
+          <div class="team-score" 
+               class:winning-score={isFinal && game.awayScore > game.homeScore}
+               class:losing-score={isFinal && (game.awayScore < game.homeScore || game.awayScore === game.homeScore)}>
+            {game.awayScore}
+          </div>
+          {/if}
         </div>
-        {/if}
       </div>
     </div>
 
@@ -440,13 +532,20 @@
             {/if}
           </div>
         </div>
-        {#if !isScheduled}
-        <div class="team-score" 
-             class:winning-score={isFinal && game.homeScore > game.awayScore}
-             class:losing-score={isFinal && (game.homeScore < game.awayScore || game.homeScore === game.awayScore)}>
-          {game.homeScore}
+        <div class="team-actions">
+          <FavoriteButton 
+            isFavorite={homeTeamIsFavorite} 
+            size="small"
+            on:toggle={toggleHomeTeamFavorite}
+          />
+          {#if !isScheduled}
+          <div class="team-score" 
+               class:winning-score={isFinal && game.homeScore > game.awayScore}
+               class:losing-score={isFinal && (game.homeScore < game.awayScore || game.homeScore === game.awayScore)}>
+            {game.homeScore}
+          </div>
+          {/if}
         </div>
-        {/if}
       </div>
     </div>
   </div>
@@ -457,6 +556,15 @@
       <div class="date-text">
         {displayDate}{#if displayTime} - {displayTime}{/if}
       </div>
+      {#if game.url}
+        <button 
+          on:click={() => window.open(game.url, '_blank', 'noopener,noreferrer')}
+          class="external-link-button" 
+          title="View on ESPN"
+        >
+          ↗
+        </button>
+      {/if}
     </div>
   {/if}
 
@@ -464,15 +572,13 @@
   {#if isPostponed || isCancelled}
     <div class="game-date">
       <div class="status-message {isPostponed ? 'postponed-badge' : 'cancelled-badge'}">
-        <span>
-          {#if isPostponed}
-            Postponed
-          {:else}
-            Cancelled
-          {/if}
-        </span>
+        {isPostponed ? '⏸️ POSTPONED' : '❌ CANCELLED'}
       </div>
     </div>
   {/if}
+
+  <!-- Clickable overlay for navigation -->
+  <a href="/game/{game.id}?backTo={backTo}" class="card-link-overlay" aria-label="View game details">
+    <span class="sr-only">View game details</span>
   </a>
 </div>
