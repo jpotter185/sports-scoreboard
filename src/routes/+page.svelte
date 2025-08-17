@@ -1,5 +1,6 @@
 <script lang="ts">
   import LeagueSection from '$lib/components/LeagueSection.svelte';
+  import FavoriteButton from '$lib/components/FavoriteButton.svelte';
   import { onMount } from 'svelte';
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
@@ -24,6 +25,7 @@
   let reorderMode = false;
   let liveOnly = false;
   let showFavoritesOnly = false;
+  let showFavoriteTeams = true;
 
   // Create reactive data that updates when favorites change
   $: reactiveScoreboardData = (() => {
@@ -443,177 +445,152 @@
 
   /* New styles for favorite teams section */
   .favorite-teams-section {
-    margin-top: 24px;
-    padding: 24px;
-    background: #f9fafb;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e5e7eb;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-
-  .favorite-teams-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
-    justify-items: center;
-  }
-
-  .favorite-team-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #334155;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
-    transition: all 0.2s ease;
-    width: 100%;
-    max-width: 150px;
-  }
-
-  .favorite-team-card:hover {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  }
-
-  .team-logo {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f3f4f6;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    overflow: hidden;
-  }
-
-  .team-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .team-logo-fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f3f4f6;
-    border-radius: 12px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #4b5563;
-  }
-
-  .team-info {
-    text-align: center;
-    width: 100%;
-  }
-
-  .team-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .team-league {
-    font-size: 0.75rem;
-    color: #6b7280;
-    margin-bottom: 4px;
-  }
-
-  .team-record {
-    font-size: 0.75rem;
-    color: #4b5563;
-  }
-
-  /* Favorite Teams Section */
-  .favorite-teams-section {
-    margin: 32px 0;
-    padding: 24px;
+    margin-top: 20px;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
   }
 
-  .section-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #111827;
-    margin-bottom: 20px;
-    text-align: center;
+  .favorite-teams-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
   }
 
   .favorite-teams-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    gap: 12px;
+    padding: 16px;
   }
 
   .favorite-team-card {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    padding: 20px;
+    gap: 12px;
+    padding: 12px;
     background: #f8fafc;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
   }
 
   .favorite-team-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    border-color: #3b82f6;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .favorite-team-card .team-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+  }
+
+  .favorite-team-card .team-link:hover {
+    color: inherit;
+    text-decoration: none;
   }
 
   .favorite-team-card .team-logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .favorite-team-card .team-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .favorite-team-card .team-logo-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e5e7eb;
+    font-size: 14px;
+    font-weight: bold;
+    color: #6b7280;
+  }
+
+  .favorite-team-card .team-info {
+    flex: 1;
+    min-width: 0;
   }
 
   .favorite-team-card .team-name {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #111827;
-    margin-bottom: 8px;
-    text-align: center;
+    font-size: 14px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .favorite-team-card .team-league {
-    font-size: 0.9rem;
+    font-size: 12px;
     color: #6b7280;
-    margin-bottom: 8px;
-    text-align: center;
+    margin-bottom: 2px;
   }
 
   .favorite-team-card .team-record {
-    font-size: 0.9rem;
-    color: #059669;
+    font-size: 11px;
+    color: #9ca3af;
+  }
+
+  .collapse-button {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 6px;
     font-weight: 600;
-    text-align: center;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+  }
+
+  .collapse-button:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .collapse-button:active {
+    transform: translateY(0);
+  }
+
+  .chevron {
+    transition: transform 0.3s ease;
+  }
+
+  .chevron.rotate {
+    transform: rotate(-90deg);
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
   }
 </style>
 
@@ -668,43 +645,53 @@
         </button>
       </div>
 
-      {#if favoriteTeamsCount > 0 || favoriteLeaguesCount > 0}
-        <div style="margin-top: 12px; padding: 12px; background: #fef3c7; border-radius: 8px; border: 1px solid #fde68a;">
-          <div style="text-align: center; font-size: 14px; color: #92400e;">
-            <span>⭐</span> You have {favoriteTeamsCount} favorite team{favoriteTeamsCount !== 1 ? 's' : ''} and {favoriteLeaguesCount} favorite league{favoriteLeaguesCount !== 1 ? 's' : ''}
-          </div>
-        </div>
-      {/if}
-
       <!-- My Favorite Teams Section -->
       {#if favoriteTeamsCount > 0}
         <div class="favorite-teams-section">
-          <h2 class="section-title">⭐ My Favorite Teams</h2>
-          <div class="favorite-teams-grid">
-            {#each $favoritesStore.teams as internalTeamId}
-              {@const teamInfo = getTeamInfo(internalTeamId)}
-              {#if teamInfo}
-                <a href="/team/{teamInfo.leagueId}/{teamInfo.espnId}" class="favorite-team-card">
-                  <div class="team-logo">
-                    {#if teamInfo.team.logo}
-                      <img src={teamInfo.team.logo} alt="{teamInfo.team.name} logo" loading="lazy" />
-                    {:else}
-                      <div class="team-logo-fallback">
-                        {teamInfo.team.abbreviation}
-                      </div>
-                    {/if}
-                  </div>
-                  <div class="team-info">
-                    <div class="team-name">{teamInfo.team.name}</div>
-                    <div class="team-league">{teamInfo.leagueName}</div>
-                    {#if teamInfo.team.record}
-                      <div class="team-record">{teamInfo.team.record}</div>
-                    {/if}
-                  </div>
-                </a>
-              {/if}
-            {/each}
+          <div class="favorite-teams-header">
+            <h2 class="section-title">⭐ My Favorite Teams</h2>
+            <button class="collapse-button" on:click={() => showFavoriteTeams = !showFavoriteTeams} aria-expanded={showFavoriteTeams}>
+              <svg class="chevron" class:rotate={!showFavoriteTeams} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+              </svg>
+              {showFavoriteTeams ? 'Collapse' : 'Expand'}
+            </button>
           </div>
+          
+          {#if showFavoriteTeams}
+            <div class="favorite-teams-grid">
+              {#each $favoritesStore.teams as internalTeamId}
+                {@const teamInfo = getTeamInfo(internalTeamId)}
+                {#if teamInfo}
+                  <div class="favorite-team-card">
+                    <a href="/team/{teamInfo.leagueId}/{teamInfo.espnId}" class="team-link">
+                      <div class="team-logo">
+                        {#if teamInfo.team.logo}
+                          <img src={teamInfo.team.logo} alt="{teamInfo.team.name} logo" loading="lazy" />
+                        {:else}
+                          <div class="team-logo-fallback">
+                            {teamInfo.team.abbreviation}
+                          </div>
+                        {/if}
+                      </div>
+                      <div class="team-info">
+                        <div class="team-name">{teamInfo.team.name}</div>
+                        <div class="team-league">{teamInfo.leagueName}</div>
+                        {#if teamInfo.team.record}
+                          <div class="team-record">{teamInfo.team.record}</div>
+                        {/if}
+                      </div>
+                    </a>
+                    <FavoriteButton 
+                      isFavorite={true}
+                      size="small"
+                      on:toggle={() => favoritesStore.toggleTeam(internalTeamId)}
+                    />
+                  </div>
+                {/if}
+              {/each}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>

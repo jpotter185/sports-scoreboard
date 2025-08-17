@@ -224,8 +224,10 @@
                 <div class="table-row">
                   <div class="pos">{index + 1}</div>
                   <div class="team">
-                    <img src={team.logo} alt={team.name} class="team-logo-small" />
-                    <span class="team-name">{team.city} {team.name}</span>
+                    <a href="/team/{league.id}/{team.id}">
+                      <img src={team.logo} alt={team.name} class="team-logo-small" />
+                      <span class="team-name">{team.name}</span>
+                    </a>
                     <button 
                       class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                       on:click={() => favoritesStore.toggleTeam(team.id)}

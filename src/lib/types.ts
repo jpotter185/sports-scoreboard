@@ -31,6 +31,13 @@ export interface Team {
   pointsAgainst?: number;
 }
 
+// ESPN API stat object interface
+export interface Stat {
+  name: string;
+  value: number;
+  displayValue?: string;
+}
+
 // Internal team representation with unique IDs
 export interface InternalTeam {
   internalId: string; // e.g., "mlb-17", "nfl-17"

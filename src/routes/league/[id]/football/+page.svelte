@@ -132,8 +132,10 @@
                     <div class="table-row">
                       <div class="pos">{index + 1}</div>
                       <div class="team">
-                        <img src={team.logo} alt={team.name} class="team-logo-small" />
-                        <span class="team-name">{team.city} {team.name}</span>
+                        <a href="/team/{league.id}/{team.id}">
+                          <img src={team.logo} alt={team.name} class="team-logo-small" />
+                          <span class="team-name">{team.city} {team.name}</span>
+                        </a>
                         <span class="team-division">({team.division})</span>
                         <button 
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
@@ -171,8 +173,10 @@
                     <div class="table-row">
                       <div class="pos">{index + 1}</div>
                       <div class="team">
-                        <img src={team.logo} alt={team.name} class="team-logo-small" />
-                        <span class="team-name">{team.city} {team.name}</span>
+                        <a href="/team/{league.id}/{team.id}">
+                          <img src={team.logo} alt={team.name} class="team-logo-small" />
+                          <span class="team-name">{team.city} {team.name}</span>
+                        </a>
                         <span class="team-division">({team.division})</span>
                         <button 
                           class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
@@ -220,8 +224,10 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a href="/team/{league.id}/{team.id}">
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button 
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -270,8 +276,10 @@
                         <div class="table-row">
                           <div class="pos">{index + 1}</div>
                           <div class="team">
-                            <img src={team.logo} alt={team.name} class="team-logo-small" />
-                            <span class="team-name">{team.city} {team.name}</span>
+                            <a href="/team/{league.id}/{team.id}">
+                              <img src={team.logo} alt={team.name} class="team-logo-small" />
+                              <span class="team-name">{team.city} {team.name}</span>
+                            </a>
                             <button 
                               class="favorite-btn {team.isFavorite ? 'favorited' : ''}"
                               on:click={() => favoritesStore.toggleTeam(team.id)}
@@ -384,6 +392,7 @@
 
   .standings-container {
     margin-bottom: 32px;
+    width: 100%;
   }
 
   .standings-section {
@@ -392,6 +401,7 @@
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
+    width: 100%;
   }
 
   .section-header {
@@ -415,210 +425,182 @@
     transition: transform 0.2s ease;
   }
 
-  /* NFL Standings Styles */
+  /* NFL Standings Styles - Using exact same format as MLS/EPL/MLB */
+  .nfl-standings {
+    width: 100%;
+  }
+
   .nfl-standings .league-section {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
   }
 
   .nfl-standings .league-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
     background: linear-gradient(135deg, #dc2626, #ef4444);
-    border: none;
-    border-radius: 16px;
-    padding: 20px 24px;
-    font-size: 1.3rem;
-    font-weight: 700;
     color: white;
+    padding: 16px 20px;
     cursor: pointer;
-    text-align: left;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
-    margin-bottom: 24px;
+    transition: all 0.2s ease;
   }
 
   .nfl-standings .league-header:hover {
     background: linear-gradient(135deg, #b91c1c, #dc2626);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
   }
 
   .nfl-standings .league-title {
-    font-size: 24px;
-    font-weight: 800;
-    color: white;
+    font-size: 18px;
+    font-weight: 700;
     margin: 0;
-    padding: 0;
-    background: none;
-    border-radius: 0;
-    text-align: left;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    color: white;
+  }
+
+  .nfl-standings .expand-icon {
+    font-size: 18px;
+    color: white;
+    transition: transform 0.2s ease;
   }
 
   .nfl-standings .division-group {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
     border: 1px solid #e5e7eb;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-  }
-
-  .nfl-standings .division-group:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(-1px);
+    margin: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   }
 
   .nfl-standings .division-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0;
-    padding: 16px 20px;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    margin: 0;
   }
 
-  .nfl-standings .division-title:hover {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-    border-color: #cbd5e1;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .nfl-standings .expand-icon {
-    font-size: 1.4rem;
-    color: #64748b;
-    font-weight: 700;
-    transition: all 0.3s ease;
-    background: white;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .nfl-standings .league-header .expand-icon {
-    color: white;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
+  /* Conference standings layout */
   .nfl-standings .conference-standings {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 
   .nfl-standings .conference-section {
-    flex: 1;
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
     border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-  }
-
-  .nfl-standings .conference-section:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
   }
 
   .nfl-standings .conference-title {
-    font-size: 1.2rem;
-    font-weight: 700;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     color: #1e293b;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 16px;
     border-bottom: 1px solid #e5e7eb;
+    margin: 0;
   }
 
+  /* Using exact same table format as soccer standings */
+  .nfl-standings .nfl-table,
   .nfl-standings .conference-table {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    border-radius: 12px;
+    gap: 4px;
+    border-radius: 8px;
     overflow: hidden;
     border: 1px solid #e5e7eb;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
+  .nfl-standings .nfl-table .table-header,
   .nfl-standings .conference-table .table-header {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
+    grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     font-weight: 700;
     color: #374151;
-    font-size: 13px;
-    padding: 16px;
+    font-size: 12px;
+    padding: 12px 14px;
     border-bottom: 2px solid #e5e7eb;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
+  .nfl-standings .nfl-table .table-row,
   .nfl-standings .conference-table .table-row {
     display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px 60px;
-    padding: 14px 16px;
+    grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px;
+    padding: 10px 14px;
     border-bottom: 1px solid #f3f4f6;
     align-items: center;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.2s ease;
   }
 
+  .nfl-standings .nfl-table .table-row:hover,
   .nfl-standings .conference-table .table-row:hover {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     transform: translateX(2px);
   }
 
+  .nfl-standings .nfl-table .table-row:nth-child(even),
   .nfl-standings .conference-table .table-row:nth-child(even) {
     background: #fafbfc;
   }
 
+  .nfl-standings .nfl-table .table-row:nth-child(even):hover,
   .nfl-standings .conference-table .table-row:nth-child(even):hover {
     background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   }
 
+  .nfl-standings .nfl-table .table-row:last-child,
   .nfl-standings .conference-table .table-row:last-child {
     border-bottom: none;
   }
 
+  .nfl-standings .nfl-table .pos,
   .nfl-standings .conference-table .pos {
     font-weight: 700;
     color: #1e293b;
     text-align: center;
     background: #f1f5f9;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
   }
 
+  .nfl-standings .nfl-table .team,
   .nfl-standings .conference-table .team {
     font-weight: 500;
     color: #111827;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
+  .nfl-standings .nfl-table .team-logo-small,
   .nfl-standings .conference-table .team-logo-small {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e5e7eb;
   }
 
+  .nfl-standings .nfl-table .team-name,
   .nfl-standings .conference-table .team-name {
     flex-grow: 1;
     overflow: hidden;
@@ -627,195 +609,112 @@
     font-weight: 600;
   }
 
-  .nfl-standings .conference-table .team-division {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-left: 8px;
+  /* Team link styling - same as MLS/EPL */
+  .nfl-standings .nfl-table .team a,
+  .nfl-standings .conference-table .team a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
   }
 
-  .nfl-standings .conference-table .w, .nfl-standings .conference-table .l, .nfl-standings .conference-table .t, .nfl-standings .conference-table .pct, .nfl-standings .conference-table .pf, .nfl-standings .conference-table .pa {
+  .nfl-standings .nfl-table .team a:hover,
+  .nfl-standings .conference-table .team a:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .nfl-standings .nfl-table .w,
+  .nfl-standings .nfl-table .l,
+  .nfl-standings .nfl-table .t,
+  .nfl-standings .nfl-table .pct,
+  .nfl-standings .nfl-table .pf,
+  .nfl-standings .nfl-table .pa,
+  .nfl-standings .conference-table .w,
+  .nfl-standings .conference-table .l,
+  .nfl-standings .conference-table .t,
+  .nfl-standings .conference-table .pct,
+  .nfl-standings .conference-table .pf,
+  .nfl-standings .conference-table .pa {
     text-align: center;
     font-weight: 600;
     color: #374151;
   }
 
-  .nfl-standings .conference-table .w, .nfl-standings .conference-table .l, .nfl-standings .conference-table .t {
+  .nfl-standings .nfl-table .w,
+  .nfl-standings .nfl-table .l,
+  .nfl-standings .nfl-table .t,
+  .nfl-standings .conference-table .w,
+  .nfl-standings .conference-table .l,
+  .nfl-standings .conference-table .t {
     background: #f8fafc;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
   }
 
+  .nfl-standings .nfl-table .pct,
   .nfl-standings .conference-table .pct {
     background: #f0f9ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
     color: #0369a1;
   }
 
+  .nfl-standings .nfl-table .pf,
   .nfl-standings .conference-table .pf {
     background: #fef3c7;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 13px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
     color: #92400e;
   }
 
+  .nfl-standings .nfl-table .pa,
   .nfl-standings .conference-table .pa {
     background: #f3e8ff;
-    border-radius: 6px;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
     color: #7c3aed;
   }
 
-  /* Division Tables */
-  .nfl-standings .nfl-table {
-    display: flex;
-    flex-direction: column;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e5e7eb;
-    margin-bottom: 24px;
-  }
-
-  .nfl-standings .nfl-table .table-header {
-    display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px;
-    background: linear-gradient(135deg, #1e293b, #334155);
-    color: white;
-    font-weight: 600;
-    padding: 16px;
-    gap: 12px;
-    align-items: center;
-  }
-
-  .nfl-standings .nfl-table .table-row {
-    display: grid;
-    grid-template-columns: 40px 2fr 40px 40px 40px 40px 40px 60px 60px;
-    padding: 16px;
-    gap: 12px;
-    align-items: center;
-    border-bottom: 1px solid #e5e7eb;
-    transition: all 0.2s ease;
-  }
-
-  .nfl-standings .nfl-table .table-row:hover {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    transform: translateX(2px);
-  }
-
-  .nfl-standings .nfl-table .table-row:nth-child(even) {
-    background: #fafbfc;
-  }
-
-  .nfl-standings .nfl-table .table-row:nth-child(even):hover {
-    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  }
-
-  .nfl-standings .nfl-table .table-row:last-child {
-    border-bottom: none;
-  }
-
-  .nfl-standings .nfl-table .pos {
-    font-weight: 700;
-    color: #1e293b;
-    text-align: center;
-  }
-
-  .nfl-standings .nfl-table .team {
-    font-weight: 500;
-    color: #111827;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .nfl-standings .nfl-table .team-logo-small {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .nfl-standings .nfl-table .team-name {
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .nfl-standings .nfl-table .w, .nfl-standings .nfl-table .l, .nfl-standings .nfl-table .t, .nfl-standings .nfl-table .pct, .nfl-standings .nfl-table .pf, .nfl-standings .nfl-table .pa {
-    text-align: center;
-    font-weight: 600;
-    color: #374151;
-  }
-
-  .nfl-standings .nfl-table .w, .nfl-standings .nfl-table .l, .nfl-standings .nfl-table .t {
-    background: #f8fafc;
-    border-radius: 6px;
-    padding: 4px 8px;
-    color: #1e293b;
-  }
-
-  .nfl-standings .nfl-table .pct {
-    background: #f0f9ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    color: #0369a1;
-  }
-
-  .nfl-standings .nfl-table .pf {
-    background: #fef3c7;
-    border-radius: 6px;
-    padding: 4px 8px;
-    color: #92400e;
-  }
-
-  .nfl-standings .nfl-table .pa {
-    background: #f3e8ff;
-    border-radius: 6px;
-    padding: 4px 8px;
-    color: #7c3aed;
-  }
-
+  /* Favorite button styling */
   .favorite-btn {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     color: #94a3b8;
-    border-radius: 6px;
-    padding: 4px 8px;
+    border-radius: 4px;
+    padding: 3px 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 14px;
-    min-width: 28px;
-    height: 28px;
+    font-size: 12px;
+    min-width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 8px;
   }
 
   .favorite-btn:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: #e2e8f0;
     color: #64748b;
     transform: scale(1.05);
   }
 
   .favorite-btn.favorited {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    border-color: #f59e0b;
-    color: white;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    background: #fef3c7;
+    color: #f59e0b;
+    border-color: #fbbf24;
   }
 
   .favorite-btn.favorited:hover {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border-color: #d97706;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    background: #fde68a;
+    color: #d97706;
   }
 
   /* Loading and Error States */
@@ -906,7 +805,42 @@
     background: #2563eb;
   }
 
-  /* Mobile adjustments */
+  /* Responsive design - using exact same as soccer */
+  @media (max-width: 1024px) {
+    .nfl-standings .nfl-table .table-header,
+    .nfl-standings .nfl-table .table-row,
+    .nfl-standings .conference-table .table-header,
+    .nfl-standings .conference-table .table-row {
+      grid-template-columns: 35px 1.8fr 35px 35px 35px 35px 35px 50px 50px;
+      font-size: 12px;
+      padding: 12px 14px;
+    }
+    
+    .nfl-standings .nfl-table .team-logo-small,
+    .nfl-standings .conference-table .team-logo-small {
+      width: 22px;
+      height: 22px;
+    }
+    
+    .nfl-standings .nfl-table .pos,
+    .nfl-standings .nfl-table .w,
+    .nfl-standings .nfl-table .l,
+    .nfl-standings .nfl-table .t,
+    .nfl-standings .nfl-table .pct,
+    .nfl-standings .nfl-table .pf,
+    .nfl-standings .nfl-table .pa,
+    .nfl-standings .conference-table .pos,
+    .nfl-standings .conference-table .w,
+    .nfl-standings .conference-table .l,
+    .nfl-standings .conference-table .t,
+    .nfl-standings .conference-table .pct,
+    .nfl-standings .conference-table .pf,
+    .nfl-standings .conference-table .pa {
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+  }
+
   @media (max-width: 768px) {
     .container {
       padding: 16px;
@@ -918,19 +852,91 @@
       align-items: flex-start;
     }
     
-    .nfl-standings .table-header, .nfl-standings .table-row {
-      grid-template-columns: 30px 1.5fr 30px 30px 30px 40px 40px 40px;
-      font-size: 12px;
-      padding: 8px 12px;
+    .nfl-standings .nfl-table .table-header,
+    .nfl-standings .nfl-table .table-row,
+    .nfl-standings .conference-table .table-header,
+    .nfl-standings .conference-table .table-row {
+      grid-template-columns: 30px 1.5fr 30px 30px 30px 30px 30px 40px 40px;
+      font-size: 11px;
+      padding: 10px 12px;
     }
     
-    .nfl-standings .league-title {
-      font-size: 20px;
-      padding: 10px 16px;
+    .nfl-standings .nfl-table .team-logo-small,
+    .nfl-standings .conference-table .team-logo-small {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .nfl-standings .nfl-table .team,
+    .nfl-standings .conference-table .team {
+      gap: 8px;
+    }
+    
+    .nfl-standings .nfl-table .pos,
+    .nfl-standings .nfl-table .w,
+    .nfl-standings .nfl-table .l,
+    .nfl-standings .nfl-table .t,
+    .nfl-standings .nfl-table .pct,
+    .nfl-standings .nfl-table .pf,
+    .nfl-standings .nfl-table .pa,
+    .nfl-standings .conference-table .pos,
+    .nfl-standings .conference-table .w,
+    .nfl-standings .conference-table .l,
+    .nfl-standings .conference-table .t,
+    .nfl-standings .conference-table .pct,
+    .nfl-standings .conference-table .pf,
+    .nfl-standings .conference-table .pa {
+      padding: 2px 4px;
+      font-size: 11px;
+    }
+    
+    .nfl-standings .division-group {
+      margin: 12px;
     }
     
     .nfl-standings .division-title {
-      font-size: 16px;
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nfl-standings .nfl-table .table-header,
+    .nfl-standings .nfl-table .table-row,
+    .nfl-standings .conference-table .table-header,
+    .nfl-standings .conference-table .table-row {
+      grid-template-columns: 25px 1.3fr 25px 25px 25px 25px 25px 35px 35px;
+      font-size: 10px;
+      padding: 8px 10px;
+    }
+    
+    .nfl-standings .nfl-table .team-logo-small,
+    .nfl-standings .conference-table .team-logo-small {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .nfl-standings .nfl-table .team,
+    .nfl-standings .conference-table .team {
+      gap: 6px;
+    }
+    
+    .nfl-standings .nfl-table .pos,
+    .nfl-standings .nfl-table .w,
+    .nfl-standings .nfl-table .l,
+    .nfl-standings .nfl-table .t,
+    .nfl-standings .nfl-table .pct,
+    .nfl-standings .nfl-table .pf,
+    .nfl-standings .nfl-table .pa,
+    .nfl-standings .conference-table .pos,
+    .nfl-standings .conference-table .w,
+    .nfl-standings .conference-table .l,
+    .nfl-standings .conference-table .t,
+    .nfl-standings .conference-table .pct,
+    .nfl-standings .conference-table .pf,
+    .nfl-standings .conference-table .pa {
+      padding: 2px 3px;
+      font-size: 10px;
     }
   }
 </style>

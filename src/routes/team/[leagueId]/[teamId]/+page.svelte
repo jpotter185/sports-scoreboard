@@ -29,6 +29,39 @@
   $: leagueEmoji = league?.id === 'nfl' ? '🏈' : 
                    league?.id === 'mlb' ? '⚾' : '⚽';
 
+  // Determine back navigation - prioritize going back to the league page
+  $: backTo = (() => {
+    // If there's a backTo query parameter, use it
+    const queryBackTo = $page.url.searchParams.get('backTo');
+    if (queryBackTo) return queryBackTo;
+    
+    // Check if user came from the main page by looking at referrer
+    if (browser && document.referrer) {
+      const referrer = new URL(document.referrer);
+      // If referrer is the main page (root path), go back there
+      if (referrer.pathname === '/' || referrer.pathname === '') {
+        return '/';
+      }
+    }
+    
+    // Otherwise, go back to the league page
+    return `/league/${league.id}`;
+  })();
+
+  // Determine back button text
+  $: backButtonText = (() => {
+    if ($page.url.searchParams.get('backTo')) {
+      return '← Back';
+    }
+    if (browser && document.referrer) {
+      const referrer = new URL(document.referrer);
+      if (referrer.pathname === '/' || referrer.pathname === '') {
+        return '← Back to Main';
+      }
+    }
+    return `← Back to ${league.name}`;
+  })();
+
   // Check if team is favorite
   $: teamInternalId = `${league.id}-${team.id}`;
   $: isTeamFavorite = $favoritesStore.teams.includes(teamInternalId);
@@ -76,7 +109,7 @@
 <div class="container">
   <!-- Header -->
   <div class="header">
-    <a href="/" class="back-link">← Back </a>
+    <a href={backTo} class="back-link">{backButtonText}</a>
     
     <div class="team-info">
       <div class="team-header">
@@ -137,9 +170,9 @@
           <div class="stat-value">{wins}</div>
           <div class="stat-label">Wins</div>
         </div>
-        {#if team.draws}
+        {#if league.id === 'mls' || league.id === 'epl' || team.draws}
           <div class="stat-card">
-            <div class="stat-value">{team.draws}</div>
+            <div class="stat-value">{team.draws || 0}</div>
             <div class="stat-label">Draws</div>
           </div>
         {/if}
@@ -152,12 +185,6 @@
           <div class="stat-value">{winPercentage}</div>
           <div class="stat-label">Win %</div>
         </div>
-        {/if}
-        {#if team.record}
-          <div class="stat-card record-card">
-            <div class="stat-value">{team.record}</div>
-            <div class="stat-label">Record</div>
-          </div>
         {/if}
       </div>
     </div>
@@ -330,10 +357,6 @@
     font-size: 0.9rem;
     color: #6b7280;
     font-weight: 500;
-  }
-
-  .record-card .stat-value {
-    color: #059669;
   }
 
   /* Games Section */

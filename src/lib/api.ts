@@ -1,4 +1,4 @@
-import type { Game, Team } from './types';
+import type { ScoreboardData, League, Game, Team, Stat } from './types';
 
 const ESPN_NFL_API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard';
 const ESPN_MLS_API = 'https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard';
@@ -407,14 +407,14 @@ export async function fetchMLSTeams(fetchFn?: typeof globalThis.fetch): Promise<
       const logo = team.logos?.[0]?.href;
       
       // Extract soccer-specific stats
-      const gamesPlayed = stats.find(s => s.name === 'gamesPlayed')?.value || 0;
-      const wins = stats.find(s => s.name === 'wins')?.value || 0;
-      const draws = stats.find(s => s.name === 'ties')?.value || 0;
-      const losses = stats.find(s => s.name === 'losses')?.value || 0;
-      const goalsFor = stats.find(s => s.name === 'points')?.value || 0;
-      const goalsAgainst = stats.find(s => s.name === 'pointsAgainst')?.value || 0;
-      const goalsDiff = stats.find(s => s.name === 'pointDifferential')?.value || 0;
-      const points = stats.find(s => s.name === 'points')?.value || 0;
+      const gamesPlayed = stats.find((s: Stat) => s.name === 'gamesPlayed')?.value || 0;
+      const wins = stats.find((s: Stat) => s.name === 'wins')?.value || 0;
+      const draws = stats.find((s: Stat) => s.name === 'ties')?.value || 0;
+      const losses = stats.find((s: Stat) => s.name === 'losses')?.value || 0;
+      const goalsFor = stats.find((s: Stat) => s.name === 'points')?.value || 0;
+      const goalsAgainst = stats.find((s: Stat) => s.name === 'pointsAgainst')?.value || 0;
+      const goalsDiff = stats.find((s: Stat) => s.name === 'pointDifferential')?.value || 0;
+      const points = stats.find((s: Stat) => s.name === 'points')?.value || 0;
       const conference = statsData.team.groups.id === '1' ? 'Eastern Conference' : 'Western Conference';
 
       return {
@@ -471,22 +471,29 @@ export async function fetchEPLTeams(fetchFn?: typeof globalThis.fetch): Promise<
     if (!data.sports?.[0]?.leagues?.[0]?.teams) {
       return [];
     }
+    
 
-    return data.sports[0].leagues[0].teams.map(espnTeam => {
-      const team = espnTeam.team;
-      const stats = espnTeam.stats || [];
+    return Promise.all(data.sports[0].leagues[0].teams.map(async (espnTeam) => {
       
+      const team = espnTeam.team;
+
+      const statsResponseUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/${team.id}`;
+
+      const statsResponse = await fetchFunction(statsResponseUrl);
+      const statsData = await statsResponse.json();
+      const stats = statsData.team.record.items[0].stats;
       // Extract logo from team.logos array
       const logo = team.logos?.[0]?.href;
       
       // Extract soccer-specific stats
-      const gamesPlayed = stats.find(s => s.name === 'gamesPlayed')?.value || 0;
-      const wins = stats.find(s => s.name === 'wins')?.value || 0;
-      const draws = stats.find(s => s.name === 'draws')?.value || 0;
-      const losses = stats.find(s => s.name === 'losses')?.value || 0;
-      const goalsFor = stats.find(s => s.name === 'goalsFor')?.value || 0;
-      const goalsAgainst = stats.find(s => s.name === 'goalsAgainst')?.value || 0;
-      const points = stats.find(s => s.name === 'points')?.value || 0;
+      const gamesPlayed = stats.find((s: Stat) => s.name === 'gamesPlayed')?.value || 0;
+      const wins = stats.find((s: Stat) => s.name === 'wins')?.value || 0;
+      const draws = stats.find((s: Stat) => s.name === 'ties')?.value || 0;
+      const losses = stats.find((s: Stat) => s.name === 'losses')?.value || 0;
+      const goalsFor = stats.find((s: Stat) => s.name === 'points')?.value || 0;
+      const goalsAgainst = stats.find((s: Stat) => s.name === 'pointsAgainst')?.value || 0;
+      const goalsDiff = stats.find((s: Stat) => s.name === 'pointDifferential')?.value || 0;
+      const points = stats.find((s: Stat) => s.name === 'points')?.value || 0;
       
       return {
         id: team.id,
@@ -503,9 +510,10 @@ export async function fetchEPLTeams(fetchFn?: typeof globalThis.fetch): Promise<
         losses,
         goalsFor,
         goalsAgainst,
+        goalsDiff,
         points
       };
-    });
+    }));
   } catch (error) {
     console.error('Error fetching EPL teams:', error);
     return [];
@@ -562,7 +570,6 @@ async function fetchMLBTeamStats(teamAbbr: string, teamName: string, fetchFn?: t
 }
 
 // Function to fetch detailed NFL team stats from ESPN individual team API
-// ... existing code ...
 async function fetchNFLTeamStats(teamId: string, fetchFn?: typeof globalThis.fetch): Promise<any> {
   try {
     // Use the better ESPN core API endpoint that provides comprehensive stats

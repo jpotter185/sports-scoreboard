@@ -378,7 +378,7 @@
           <h3 class="section-title">Games</h3>
           <div class="games-grid">
             {#each sortedGames as game (game.id)}
-              <GameCard {game} backTo="/" leagueId={league.id} />
+              <GameCard {game} backTo="/league/{league.id}" leagueId={league.id} />
             {/each}
           </div>
         </div>

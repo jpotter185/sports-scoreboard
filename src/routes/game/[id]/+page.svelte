@@ -105,7 +105,6 @@
   $: winningTeam = isFinal && game ? 
     (game.awayScore > game.homeScore ? game.awayTeam : game.homeScore > game.awayScore ? game.homeTeam : null) : null;
   $: isTie = isFinal && game && game.awayScore === game.homeScore;
-  console.log(game);
   // Get league info
   $: leagueId = game ? (game.awayTeam.conference === 'NFC' || game.awayTeam.conference === 'AFC' ? 'nfl' : 
                         game.awayTeam.conference === 'American League' || game.awayTeam.conference === 'National League' ? 'mlb' : 
