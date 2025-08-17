@@ -5,7 +5,9 @@
   import type { ScoreboardData, League } from '$lib/types';
   import { browser } from '$app/environment';
   import { injectAnalytics } from '@vercel/analytics/sveltekit'
-  
+  import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+  injectSpeedInsights();
   injectAnalytics();
   let scoreboardData: ScoreboardData = { leagues: [], lastUpdated: '' };
   let loading = true;
