@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Security updates only: the limit of 0 turns off routine version-update PRs,
+  # but security updates still follow the ignore rules below.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      # SvelteKit 3 is blocked on @vercel/analytics support; the cookie fix only
+      # arrives with Kit 3, and adapter-auto 9 requires it
+      - dependency-name: "@sveltejs/kit"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@sveltejs/adapter-auto"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "cookie"
+        update-types: ["version-update:semver-major"]
